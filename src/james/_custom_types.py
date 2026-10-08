@@ -17,7 +17,7 @@ from typing import Callable
 
 from pygame import Surface
 
-from widgets_and_stuff._base_elem import Element
+from james._base_elem import Element
 
 
 type Colour = tuple[int, int, int]

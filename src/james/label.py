@@ -17,8 +17,8 @@ import pygame as pg
 
 from typing import Any
 
-from widgets_and_stuff._custom_types import Colour
-from widgets_and_stuff.utils import crop_text_to_fit, get_text_surf
+from james._custom_types import Colour
+from james.utils import crop_text_to_fit, get_text_surf
 from ._base_elem import Element
 
 

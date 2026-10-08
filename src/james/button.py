@@ -19,9 +19,9 @@ from typing import Any
 
 import pygame as pg
 
-from widgets_and_stuff._custom_types import Colour
-from widgets_and_stuff._img_cache import img_cache
-from widgets_and_stuff.utils import get_text_surf, resize_to_fit
+from james._custom_types import Colour
+from james._img_cache import img_cache
+from james.utils import get_text_surf, resize_to_fit
 
 from ._base_elem import Element
 
