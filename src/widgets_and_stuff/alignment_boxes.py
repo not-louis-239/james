@@ -17,7 +17,7 @@ from enum import StrEnum
 
 import pygame as pg
 
-from ._base_widget import Widget
+from ._base_elem import Element
 
 
 class HAlign(StrEnum):
@@ -31,10 +31,10 @@ class VAlign(StrEnum):
     BOTTOM = "bottom"
 
 
-class _Box(Widget):
+class _Box(Element):
     """Generic base class to store attributes common to both `HBox`es and `VBox`es"""
 
-    def __init__(self, *children: Widget, padding: int = 0, gap: int = 0) -> None:
+    def __init__(self, *children: Element, padding: int = 0, gap: int = 0) -> None:
         """Initialises a new box.
         padding = space between the box's edge and the first or last child
         gap     = space between children in the box"""
@@ -46,7 +46,7 @@ class _Box(Widget):
             for child in children:
                 self.add_child(child)
 
-    def add_child(self, child: Widget) -> None:
+    def add_child(self, child: Element) -> None:
         self.children.append(child)
 
 class HBox(_Box):
@@ -76,7 +76,7 @@ class HBox(_Box):
 
         # measure fixed sizes
         total_fixed_width = 0
-        flex_children: list[Widget] = []
+        flex_children: list[Element] = []
 
         for child in self.children:
             flex = child.flex
@@ -181,7 +181,7 @@ class SBox(_Box):
     """Sized box that gives its child a fixed-size slot, with alignment."""
 
     def __init__(
-            self, child: Widget, *,
+            self, child: Element, *,
             forced_width: int | None = None, forced_height: int | None = None,
             h_align: HAlign = HAlign.CENTRE,
             v_align: VAlign = VAlign.CENTRE

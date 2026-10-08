@@ -17,17 +17,17 @@ from typing import Any
 
 import pygame as pg
 
-from widgets_and_stuff._base_widget import Widget
+from widgets_and_stuff._base_elem import Element
 
 
-class Panel(Widget):
+class Panel(Element):
     """A simple panel that can contain one child with padding."""
     def __init__(
             self, *, flex: float = 0,
             draw_attrs: dict[str, Any] | None = None,
             colours: dict[str, tuple[int, int, int]] | None = None,
             horiz_padding: int = 0, vert_padding: int = 0,
-            child: Widget | None = None
+            child: Element | None = None
         ) -> None:
         super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours)
         self.horiz_padding = horiz_padding

@@ -17,8 +17,8 @@ from typing import Callable
 
 from pygame import Surface
 
-from widgets_and_stuff._base_widget import Widget
+from widgets_and_stuff._base_elem import Element
 
 
 type Colour = tuple[int, int, int]
-type DrawFunc = Callable[[Surface, Widget], None]
+type DrawFunc = Callable[[Surface, Element], None]

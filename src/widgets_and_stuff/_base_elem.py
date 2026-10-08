@@ -15,7 +15,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Callable
 from abc import ABC, abstractmethod
 
 import pygame as pg
@@ -24,17 +24,19 @@ import pygame as pg
 from ._custom_types import Colour
 
 
-class Widget(ABC):
+class Element(ABC):
     def __init__(
             self, *, flex: float = 0.0,
             draw_attrs: dict[str, Any] | None = None,
-            colours: dict[str, Colour] | None = None
+            colours: dict[str, Colour] | None = None,
+            draw_func: Callable[..., None] | None = None
         ) -> None:
         self.flex = flex
         self.rect = pg.Rect(0, 0, 0, 0)
-        self.children: list[Widget] = []
+        self.children: list[Element] = []
         self.visible: bool = True
         self.active: bool = False
+        self.draw_func = draw_func
 
         # These dicts are to allow implementation of custom draw functions
         # and attaching custom attributes for drawing and colouring

@@ -17,12 +17,12 @@ from typing import Any
 
 import pygame as pg
 
-from widgets_and_stuff._base_widget import Widget
+from widgets_and_stuff._base_elem import Element
 from widgets_and_stuff._custom_types import Colour
 from widgets_and_stuff.utils import get_text_surf, wrap_text
 
 
-class InputBox(Widget):
+class InputBox(Element):
     DELETE_DELAY = 0.5
     DELETE_INTERVAL = 0.075
 

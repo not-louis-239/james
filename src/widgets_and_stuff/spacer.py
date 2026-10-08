@@ -15,10 +15,10 @@
 
 from pygame import Rect
 
-from ._base_widget import Widget
+from ._base_elem import Element
 
 
-class Spacer(Widget):
+class Spacer(Element):
     def __init__(self, *, flex: float = 0.0, min_w: int = 0, min_h: int = 0) -> None:
         super().__init__(flex=flex)
         self.min_w = min_w

@@ -14,7 +14,7 @@
 
 
 from . import (
-    _base_widget,
+    _base_elem,
     alignment_boxes,
     button,
     input_box,
@@ -23,3 +23,18 @@ from . import (
     scrollable_display,
     spacer
 )
+
+Element = _base_elem.Element
+
+HBox = alignment_boxes.HBox
+VBox = alignment_boxes.VBox
+SBox = alignment_boxes.SBox
+
+RectButton = button.RectButton
+CircleButton = button.CircleButton
+
+Spacer = spacer.Spacer
+ScrollableDisplay = scrollable_display.ScrollableDisplay
+Panel = panel.Panel
+Label = label.Label
+InputBox = input_box.InputBox

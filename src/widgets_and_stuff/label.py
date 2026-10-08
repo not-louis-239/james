@@ -18,10 +18,10 @@ import pygame as pg
 from typing import Any
 
 from widgets_and_stuff._custom_types import Colour
-from ._base_widget import Widget
+from ._base_elem import Element
 
 
-class Label(Widget):
+class Label(Element):
     def __init__(
             self, *, flex: float = 0,
             draw_attrs: dict[str, Any] | None = None,
