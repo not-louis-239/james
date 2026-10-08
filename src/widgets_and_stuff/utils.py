@@ -19,7 +19,7 @@ from dataclasses import dataclass
 import pygame as pg
 
 from ._custom_types import Colour
-from ._constants import BLACK
+from ._constants import DUMMY_BLACK
 
 
 @dataclass(kw_only=True)
@@ -34,7 +34,7 @@ class AmbientMessage:
         self.duration = duration
 
     def clear(self) -> None:
-        self.set_msg("", BLACK, 0.0)
+        self.set_msg("", DUMMY_BLACK, 0.0)
 
     def update(self, dt_s: float) -> None:
         self.duration = max(0, self.duration - dt_s)

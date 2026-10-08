@@ -36,8 +36,18 @@ class Widget(ABC):
         self.visible: bool = True
         self.active: bool = False
 
-        # These are to allow implementation of custom draw functions
+        # These dicts are to allow implementation of custom draw functions
         # and attaching custom attributes for drawing and colouring
+        # I would recommend attaching these to your objects using a
+        # StrEnum for the different attrs you want to have.
+
+        # Like:
+        # (
+        #     # ... the rest of your instantiated widget's constructor...
+        #     draw_attrs={DrawAttr.BORDER_W: 3},
+        #     colours={ColourAttr.BORDER: ThemeKey.BORDER}
+        # )
+
         self.draw_attrs = draw_attrs or {}
         self.colours = colours or {}
 

@@ -13,4 +13,12 @@
 # limitations under the License.
 
 
+from typing import Callable
+
+from pygame import Surface
+
+from widgets_and_stuff._base_widget import Widget
+
+
 type Colour = tuple[int, int, int]
+type DrawFunc = Callable[[Surface, Widget], None]

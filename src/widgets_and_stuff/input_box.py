@@ -18,10 +18,13 @@ from typing import Any
 import pygame as pg
 
 from widgets_and_stuff._base_widget import Widget
-from widgets_and_stuff._constants import DELETE_DELAY, DELETE_INTERVAL, CURSOR_FLASH_INTERVAL
 
 
 class InputBox(Widget):
+    DELETE_DELAY = 0.5
+    DELETE_INTERVAL = 0.075
+    CURSOR_FLASH_INTERVAL = 0.75
+
     def __init__(
             self, *, flex: float = 0,
             draw_attrs: dict[str, Any] | None = None,
@@ -37,7 +40,7 @@ class InputBox(Widget):
         self.sentinel_text = sentinel_text
         self.tooltip_msg: str | None = None
 
-        self.delete_timer = DELETE_DELAY
+        self.delete_timer = self.DELETE_DELAY
         self.cursor_flash_time = 0
 
     def set_tooltip(self, msg: str | None = None) -> None:
@@ -48,7 +51,7 @@ class InputBox(Widget):
 
     def handle_input(self, keys: pg.key.ScancodeWrapper, events: list[pg.event.Event], dt_s: float) -> None:
         if self.active:
-            self.cursor_flash_time = (self.cursor_flash_time + dt_s) % CURSOR_FLASH_INTERVAL
+            self.cursor_flash_time = (self.cursor_flash_time + dt_s) % self.CURSOR_FLASH_INTERVAL
         else:
             self.cursor_flash_time = 0
 
@@ -72,11 +75,11 @@ class InputBox(Widget):
             self.delete_timer -= dt_s
             if self.delete_timer <= 0:
                 self.text = self.text[:-1]
-                self.delete_timer += DELETE_INTERVAL
+                self.delete_timer += self.DELETE_INTERVAL
                 self.cursor_flash_time = 0
         else:
             # If delete is not held down, reset the delete timer
-            self.delete_timer = DELETE_DELAY
+            self.delete_timer = self.DELETE_DELAY
 
     def preferred_size(self) -> tuple[int, int]:
         return (0, self.font.get_height() + 2 * self.inset)

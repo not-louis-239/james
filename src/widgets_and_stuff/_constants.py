@@ -13,11 +13,16 @@
 # limitations under the License.
 
 
-# input box constants
-DELETE_DELAY = 0.5
-DELETE_INTERVAL = 0.075
-CURSOR_FLASH_INTERVAL = 0.75
+import pygame as pg
 
 
-# default colour
-BLACK = (0, 0, 0)
+__version__ = (0, 1, 0)
+
+
+# Well, you found something here!
+__pronouns__: list[str] = ["he", "him"]
+
+
+# dummy values
+DUMMY_BLACK = (0, 0, 0)
+DUMMY_SURFACE = pg.Surface((1, 1), flags=pg.SRCALPHA)
