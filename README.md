@@ -11,7 +11,7 @@ Use it if you want, I don't care. It's a UI library that's made to work with Pyg
 ## Dependencies
 
 Intended for use with Pygame if used as part of a larger (Pygame) project. Hence it requires:
-- Pygame (developed with v2.6.1)
+- Pygame-ce (developed with v2.5.8)
 - Python (developed with v3.14.0)
 
 ## Licence
