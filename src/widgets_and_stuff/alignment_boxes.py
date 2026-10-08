@@ -188,6 +188,7 @@ class SBox(_Box):
         ) -> None:
         super().__init__()
         self.child = child
+        self.children = [child]
 
         self.forced_width = forced_width
         self.forced_height = forced_height
