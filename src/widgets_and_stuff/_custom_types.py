@@ -22,3 +22,4 @@ from widgets_and_stuff._base_elem import Element
 
 type Colour = tuple[int, int, int]
 type DrawFunc = Callable[[Surface, Element], None]
+type IntCoord2 = tuple[int, int]  # (width, height)

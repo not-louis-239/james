@@ -30,7 +30,7 @@ class ScrollableDisplay(Element):
     def __init__(
             self, *, flex: float = 0,
             draw_attrs: dict[str, Any] | None = None,
-            colours: dict[str, tuple[int, int, int]] | None = None,
+            colours: dict[str, Colour] | None = None,
             padding: int = 0,
             child: Element,
             renderer: DrawFunc
@@ -57,8 +57,13 @@ class ScrollableDisplay(Element):
         self.internal_surface.fill((0, 0, 0, 0))
         self.renderer(self.internal_surface, self.child)
 
-    def displayable_rect(self) -> pg.Rect:
+    def get_displayable_rect(self) -> pg.Rect:
         return pg.Rect(self.physics.disp.x, self.physics.disp.y, self.rect.width - 2 * self.padding, self.rect.height - 2 * self.padding)
+
+    def blit_relevant_surf(self, dest_surface: pg.Surface) -> None:
+        """Blits the relevant portion of `self.internal_surface` to `dest_surface`."""
+        displayable_rect = self.get_displayable_rect()
+        dest_surface.blit(self.internal_surface, (self.rect.x + self.padding, self.rect.y + self.padding), area=displayable_rect)
 
     def update(self, dt_s: float) -> None:
         child_max_x, child_max_y = self.child.preferred_size()

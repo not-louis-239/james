@@ -20,6 +20,8 @@ from typing import Any
 import pygame as pg
 
 from widgets_and_stuff._custom_types import Colour
+from widgets_and_stuff._img_cache import img_cache
+from widgets_and_stuff.utils import get_text_surf, resize_to_fit
 
 from ._base_elem import Element
 
@@ -28,7 +30,7 @@ class _Button(Element):
     def __init__(
             self, *, flex: float = 0,
             draw_attrs: dict[str, Any] | None = None,
-            colours: dict[str, tuple[int, int, int]] | None = None,
+            colours: dict[str, Colour] | None = None,
             text: str = "", font: pg.font.Font, inset: int = 0,
             fixed_size: tuple[int, int] | None = None, img_path: Path | None = None,
         ) -> None:
@@ -59,17 +61,51 @@ class RectButton(_Button):
     def layout(self, rect: pg.Rect) -> None:
         self.rect = rect
 
+    def draw_primitive(self, surface: pg.Surface, fg_colour: Colour, bg_colour: Colour | None = None) -> None:
+        """Draws a primitive, borderless rectangular button."""
+
+        # Draw the button's background
+        if bg_colour is not None:
+            pg.draw.rect(surface, bg_colour, self.rect)
+
+        # Draw icon
+        if self.img_path is not None:
+            img_dims = resize_to_fit((img_cache.get_base_cache(self.img_path).get_size()), (self.rect.w, self.rect.h))
+            img_surf = img_cache.get_tinted_scaled_img(self.img_path, fg_colour, (int(img_dims[0]), int(img_dims[1])))
+            surface.blit(img_surf, img_surf.get_rect(center=self.rect.center))
+
+        # Draw text
+        text_surface = get_text_surf(self.font, self.text, fg_colour)
+        surface.blit(text_surface, text_surface.get_rect(center=self.rect.center))
+
 
 class CircleButton(_Button):
     def __init__(
             self, *, r: int, flex: float = 0,
             draw_attrs: dict[str, Any] | None = None,
-            colours: dict[str, tuple[int, int, int]] | None = None,
+            colours: dict[str, Colour] | None = None,
             text: str = "", font: pg.font.Font, inset: int = 0,
             fixed_size: tuple[int, int] | None = None, img_path: Path | None = None
         ) -> None:
         super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours, text=text, font=font, inset=inset, fixed_size=fixed_size, img_path=img_path)
         self.r = r
+
+    def draw_primitive(self, surface: pg.Surface, fg_colour: Colour, bg_colour: Colour | None = None) -> None:
+        """Draws a primitive, borderless circular button."""
+
+        # Draw background
+        if bg_colour is not None:
+            pg.draw.circle(surface, bg_colour, self.rect.center, self.r)
+
+        # Draw icon, but bound to the button circle
+        if self.img_path is not None:
+            img_surf = img_cache.get_tinted_scaled_img(self.img_path, fg_colour, self.preferred_size())
+            surface.blit(img_surf, img_surf.get_rect(center=self.rect.center))
+
+        # Draw the text
+        if self.text:
+            text_surf = get_text_surf(self.font, self.text, fg_colour)
+            surface.blit(text_surf, text_surf.get_rect(center=self.rect.center))
 
     def check_click(self, mouse_pos: tuple[int, int]) -> bool:
         dx = mouse_pos[0] - self.rect.centerx

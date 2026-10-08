@@ -18,6 +18,8 @@ from dataclasses import dataclass
 
 import pygame as pg
 
+from widgets_and_stuff._custom_types import IntCoord2
+
 from ._custom_types import Colour
 from ._constants import DUMMY_BLACK
 
@@ -143,3 +145,18 @@ def get_text_surf(font: pg.font.Font, text: str, colour: Colour):
     """Just a wrapper around pg.font.Font().render() with caching.
     Perhaps this will be helpful and improve performance slightly."""
     return font.render(text, True, colour)
+
+
+def make_tinted_scaled_surface(surface: pg.Surface, colour: Colour, size: IntCoord2 | None = None) -> pg.Surface:
+    """Tints the given surface with a given colour and resizes it using
+    pg.transform.scale() if a size is provided."""
+    tinted = surface.copy()
+    colour_surface = pg.Surface(tinted.get_size(), pg.SRCALPHA)
+    colour_surface.fill(colour)
+    tinted.blit(colour_surface, (0, 0), special_flags=pg.BLEND_RGBA_MULT)
+
+    if size:
+        tinted = pg.transform.scale(tinted, size)
+
+    return tinted
+

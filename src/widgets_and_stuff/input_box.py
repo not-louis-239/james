@@ -34,7 +34,7 @@ class InputBox(Element):
     def __init__(
             self, *, flex: float = 0,
             draw_attrs: dict[str, Any] | None = None,
-            colours: dict[str, tuple[int, int, int]] | None = None,
+            colours: dict[str, Colour] | None = None,
             font: pg.font.Font,
             inset: int = 0,
             sentinel_text: str = "",

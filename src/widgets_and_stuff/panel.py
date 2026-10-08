@@ -18,6 +18,7 @@ from typing import Any
 import pygame as pg
 
 from widgets_and_stuff._base_elem import Element
+from widgets_and_stuff._custom_types import Colour
 
 
 class Panel(Element):
@@ -25,7 +26,7 @@ class Panel(Element):
     def __init__(
             self, *, flex: float = 0,
             draw_attrs: dict[str, Any] | None = None,
-            colours: dict[str, tuple[int, int, int]] | None = None,
+            colours: dict[str, Colour] | None = None,
             horiz_padding: int = 0, vert_padding: int = 0,
             child: Element | None = None
         ) -> None:
