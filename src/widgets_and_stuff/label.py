@@ -18,6 +18,7 @@ import pygame as pg
 from typing import Any
 
 from widgets_and_stuff._custom_types import Colour
+from widgets_and_stuff.utils import crop_text_to_fit, get_text_surf
 from ._base_elem import Element
 
 
@@ -25,7 +26,7 @@ class Label(Element):
     def __init__(
             self, *, flex: float = 0,
             draw_attrs: dict[str, Any] | None = None,
-            colours: dict[str, tuple[int, int, int]] | None = None,
+            colours: dict[str, Colour] | None = None,
             text: str = "", font: pg.font.Font, inset: int = 0,
         ) -> None:
         super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours)
@@ -39,6 +40,16 @@ class Label(Element):
     def preferred_size(self) -> tuple[int, int]:
         text_w, text_h = self.font.size(self.text)
         return (text_w + 2 * self.inset, text_h + 2 * self.inset)
+
+    def draw_primitive(self, surface: pg.Surface, fg_colour: Colour, bg_colour: Colour | None = None) -> None:
+        """Draws a label to a surface. If `bg_colour` is not None, draws a solid background."""
+
+        if bg_colour is not None:
+            pg.draw.rect(surface, bg_colour, self.rect)
+
+        text = crop_text_to_fit(self.text, self.font, self.rect.width - 2 * self.inset)
+        text_surf = get_text_surf(self.font, text, fg_colour)
+        surface.blit(text_surf, self.rect.inflate(-2 * self.inset, -2 * self.inset))
 
     def layout(self, rect: pg.Rect) -> None:
         self.rect = rect
