@@ -21,7 +21,7 @@ from typing import Any
 from james._constants import DUMMY_SURFACE
 from james.scroll_physics import ScrollPhysics
 from james._base_elem import Element
-from james._custom_types import Colour, DrawFunc
+from james._custom_types import Colour, DrawFunc, SupportsGetItemColour
 
 
 class ScrollableDisplay(Element):
@@ -33,29 +33,36 @@ class ScrollableDisplay(Element):
             colours: dict[str, Colour] | None = None,
             padding: int = 0,
             child: Element,
-            renderer: DrawFunc
+            renderer: DrawFunc,
+            k_bg: str | None = None,
+            k_border: str | None = None,
+            border_w: int = 0
         ) -> None:
         super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours)
         self.padding = padding
         self.child = child
 
         self.children = [child]
+        self.internal_surface = DUMMY_SURFACE
         self.internal_rect = pg.Rect(0, 0, 0, 0)
         self.physics = ScrollPhysics(disp_topleft=(0, 0), disp_botright=(0, 0))
-        self.renderer = renderer
 
-    def refresh_internal_surface(self) -> None:
+        self.renderer = renderer
+        self.k_bg = k_bg
+        self.k_border = k_border
+        self.border_w = border_w
+
+    def _refresh_internal_surface(self, theme: SupportsGetItemColour) -> None:
         """Redraws `self`'s internal surface. Could be expensive depending
         on what is inside `self`. """
 
         # Resize the surface if needed
-        required_size = self.child.preferred_size()
-        if required_size != self.internal_surface.get_size():
+        if (required_size := self.child.preferred_size()) != self.internal_surface.get_size():
             self.internal_surface = pg.Surface(required_size, pg.SRCALPHA)
 
         # Then redraw the content
         self.internal_surface.fill((0, 0, 0, 0))
-        self.renderer(self.internal_surface, self.child)
+        self.renderer(self.internal_surface, self.child, theme)
 
     def get_displayable_rect(self) -> pg.Rect:
         return pg.Rect(self.physics.disp.x, self.physics.disp.y, self.rect.width - 2 * self.padding, self.rect.height - 2 * self.padding)
@@ -74,6 +81,24 @@ class ScrollableDisplay(Element):
     def handle_scroll(self, event: pg.event.Event) -> None:
         if self.rect.collidepoint(pg.mouse.get_pos()):
             self.physics.handle_scroll(event)
+
+    def draw_primitive(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        """Draw the content of `self` to the given surface (borderless)."""
+
+        self._refresh_internal_surface(theme)
+
+        # Background
+        if self.k_bg is not None:
+            pg.draw.rect(surface, theme[self.k_bg], self.rect)
+
+        # Get the relevant part of `self`'s internal surface
+        # and draw it on the given surface.
+        self.blit_relevant_surf(surface)
+
+    def draw_default_border(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        # Draw border
+        if self.border_w and self.k_border is not None:
+            pg.draw.rect(surface, theme[self.k_border], self.rect, width=self.border_w)
 
     def preferred_size(self) -> tuple[int, int]:
         cw, ch = self.child.preferred_size()

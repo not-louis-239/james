@@ -18,7 +18,7 @@ from typing import Any
 import pygame as pg
 
 from james._base_elem import Element
-from james._custom_types import Colour
+from james._custom_types import Colour, SupportsGetItemColour
 from james.utils import get_text_surf, wrap_text
 
 
@@ -38,15 +38,33 @@ class InputBox(Element):
             font: pg.font.Font,
             inset: int = 0,
             sentinel_text: str = "",
-            fixed_tooltip_w: int | None = None
+            fixed_tooltip_w: int | None = None,
+            border_w: int = 0,
+            k_bg: str | None = None,
+            k_bg_active: str | None = None,
+            k_fg: str,
+            k_fg_active: str | None = None,
+            k_cursor: str,
+            k_border: str | None = None,
+            k_sentinel: str | None = None
         ) -> None:
         super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours)
         self.font = font
         self.inset = inset
         self.active = False
+
         self.sentinel_text = sentinel_text
         self.tooltip_msg: str | None = None
         self.fixed_tooltip_w = fixed_tooltip_w
+        self.border_w = border_w
+
+        self.k_bg = k_bg
+        self.k_bg_active = k_bg_active
+        self.k_fg = k_fg
+        self.k_fg_active = k_fg_active if k_fg_active is not None else k_fg
+        self.k_cursor = k_cursor
+        self.k_border = k_border
+        self.k_sentinel = k_sentinel
 
         self.delete_timer = self.DELETE_DELAY
         self.cursor_flash_time = 0
@@ -89,17 +107,20 @@ class InputBox(Element):
             # If delete is not held down, reset the delete timer
             self.delete_timer = self.DELETE_DELAY
 
-    def draw_primitive(self, surface: pg.Surface, bg_colour: Colour, fg_colour: Colour, sentinel_colour: Colour) -> None:
+    def draw_primitive(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         """Draw to a surface a basic solid background,
         and the text to be rendered, cropped to fit within the input box."""
 
+        k_bg = self.k_bg_active if self.active else self.k_bg
+        k_fg = self.k_sentinel if not self.text else self.k_fg_active if self.active else self.k_fg
+
         # Background
-        pg.draw.rect(surface, bg_colour, self.rect)
+        if k_bg is not None:
+            pg.draw.rect(surface, theme[k_bg], self.rect)
 
         # Text - rendering only last 255 chars for performance
-        fg_colour = fg_colour if self.text else sentinel_colour
         text = self.text[-255:] if self.text else self.sentinel_text
-        text_surf = get_text_surf(self.font, text, fg_colour)
+        text_surf = get_text_surf(self.font, text, k_fg)
         text_visual_width = self.rect.width - 2 * self.inset
 
         # Draw the text aligned to left-centre
@@ -117,19 +138,23 @@ class InputBox(Element):
 
         surface.blit(text_surf, dest, source_rect)
 
-    def draw_cursor(self, surface: pg.Surface, colour: Colour) -> None:
+    def draw_default_border(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        if self.k_border is not None:
+            pg.draw.rect(surface, theme[self.k_border], self.rect, self.border_w)
+
+    def draw_cursor(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         # Draw the cursor
         if self.active and self.cursor_flash_time < self.CURSOR_FLASH_INTERVAL * 0.5:
             cursor_x = self.rect.x + self.inset + (0 if not self.text else min(self.CURSOR_VISUAL_W, surface.get_width()))
             cursor_top_y = self.rect.centery - surface.get_height() // 2
             cursor_bot_y = self.rect.centery + surface.get_height() // 2
-            pg.draw.line(surface, colour, (cursor_x, cursor_top_y), (cursor_x, cursor_bot_y), width=self.CURSOR_VISUAL_W)
+            pg.draw.line(surface, theme[self.k_cursor], (cursor_x, cursor_top_y), (cursor_x, cursor_bot_y), width=self.CURSOR_VISUAL_W)
 
-    def draw_tooltip(self, surface: pg.Surface, bg_colour: Colour, fg_colour: Colour) -> None:
-        """Draws a borderless tooltip. Border is open to custom implementation."""
+    def _tooltip_lines_and_rect(self) -> tuple[list[str], pg.Rect]:
+        """Return (lines, rect) for tooltip drawing."""
 
         if not self.tooltip_msg:
-            return
+            return [], pg.Rect(self.rect.left, self.rect.bottom, 0, 0)
 
         # Calculate tooltip width
         tooltip_w = self.fixed_tooltip_w or self.rect.w
@@ -142,15 +167,38 @@ class InputBox(Element):
         # Tooltip rect
         tooltip_rect = pg.Rect(self.rect.left, self.rect.bottom, tooltip_w, text_height + 2 * self.inset)
 
+        return lines, tooltip_rect
+
+    def draw_tooltip(self, surface: pg.Surface, theme: SupportsGetItemColour) -> tuple[list[str], pg.Rect]:
+        """Draws a borderless tooltip. Returns the tooltip lines and rect in
+        case they need to be used again."""
+
+        lines, rect = self._tooltip_lines_and_rect()
+        if not self.tooltip_msg:
+            return lines, rect
+
         start_x = self.rect.x + self.inset
         start_y = self.rect.bottom + self.inset
 
         # Draw background
-        pg.draw.rect(surface, bg_colour, tooltip_rect)
+        if self.k_bg is not None:
+            pg.draw.rect(surface, theme[self.k_bg], rect)
 
         # Draw text
+        font_h = self.font.get_height()
         for lineno, line in enumerate(lines):
-            surface.blit(get_text_surf(self.font, line, fg_colour), (start_x, start_y + font_h * lineno))
+            surface.blit(get_text_surf(self.font, line, self.k_fg), (start_x, start_y + font_h * lineno))
+
+        return lines, rect
+
+    def draw_tooltip_with_default_border(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        """Draws a tooltip with a default-style border for a tooltip
+        using `self.border_w` and `self.k_border` if set."""
+
+        _, rect = self.draw_tooltip(surface, theme)
+
+        if self.border_w and self.k_border is not None:
+            pg.draw.rect(surface, self.k_border, rect, self.border_w)
 
     def preferred_size(self) -> tuple[int, int]:
         return (0, self.font.get_height() + 2 * self.inset)

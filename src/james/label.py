@@ -17,7 +17,7 @@ import pygame as pg
 
 from typing import Any
 
-from james._custom_types import Colour
+from james._custom_types import Colour, SupportsGetItemColour
 from james.utils import crop_text_to_fit, get_text_surf
 from ._base_elem import Element
 
@@ -28,11 +28,18 @@ class Label(Element):
             draw_attrs: dict[str, Any] | None = None,
             colours: dict[str, Colour] | None = None,
             text: str = "", font: pg.font.Font, inset: int = 0,
+            k_fg: str, k_bg: str | None = None, k_border: str | None = None,
+            border_w: int = 0
         ) -> None:
         super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours)
         self.text = text
         self.font = font
         self.inset = inset
+
+        self.k_fg = k_fg
+        self.k_bg = k_bg
+        self.k_border = k_border
+        self.border_w = border_w
 
     def set_text(self, text: str) -> None:
         self.text = text
@@ -41,15 +48,22 @@ class Label(Element):
         text_w, text_h = self.font.size(self.text)
         return (text_w + 2 * self.inset, text_h + 2 * self.inset)
 
-    def draw_primitive(self, surface: pg.Surface, fg_colour: Colour, bg_colour: Colour | None = None) -> None:
-        """Draws a label to a surface. If `bg_colour` is not None, draws a solid background."""
+    def draw_primitive(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        """Draws a label to a surface. If a `self.k_bg` is set and not None,
+        draws a solid background."""
 
-        if bg_colour is not None:
-            pg.draw.rect(surface, bg_colour, self.rect)
+        # Background
+        if self.k_bg is not None:
+            pg.draw.rect(surface, theme[self.k_bg], self.rect)
 
+        # Text
         text = crop_text_to_fit(self.text, self.font, self.rect.width - 2 * self.inset)
-        text_surf = get_text_surf(self.font, text, fg_colour)
+        text_surf = get_text_surf(self.font, text, theme[self.k_fg])
         surface.blit(text_surf, self.rect.inflate(-2 * self.inset, -2 * self.inset))
+
+    def draw_default_border(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        if self.border_w and self.k_border is not None:
+            pg.draw.rect(surface, theme[self.k_border], self.rect, width=self.border_w)
 
     def layout(self, rect: pg.Rect) -> None:
         self.rect = rect

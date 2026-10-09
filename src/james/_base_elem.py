@@ -40,6 +40,8 @@ class Element(ABC):
         # and attaching custom attributes for drawing and colouring
         # I would recommend attaching these to your objects using a
         # StrEnum for the different attrs you want to have.
+        # Only needed if there is an attribute that you need that isn't already
+        # supplied.
 
         # Like:
         # (
@@ -47,6 +49,10 @@ class Element(ABC):
         #     draw_attrs={DrawAttr.BORDER_W: 3},
         #     colours={ColourAttr.BORDER: ThemeKey.BORDER}
         # )
+
+        # Other attributes that may be present in inherited classes
+        # are of the form `self.k_*` - these are colour keys,
+        # intended for use with a theme-type object.
 
         self.draw_attrs = draw_attrs or {}
         self.colours = colours or {}

@@ -13,9 +13,7 @@
 # limitations under the License.
 
 
-from typing import TYPE_CHECKING
-
-from typing import Callable
+from typing import TYPE_CHECKING, Protocol, Callable
 
 from pygame import Surface
 
@@ -24,5 +22,9 @@ if TYPE_CHECKING:
 
 
 type Colour = tuple[int, int, int]
-type DrawFunc = Callable[[Surface, Element], None]
-type IntCoord2 = tuple[int, int]  # (width, height)
+type DrawFunc = Callable[[Surface, Element, SupportsGetItemColour], None]  # XXX: hmm... this might need another param...a SupportsGetItemColour maybe
+type IntCoord2 = tuple[int, int]  # e.g. (width, height)
+
+# something that can be indexed like obj[str] to return a Colour
+class SupportsGetItemColour(Protocol):
+    def __getitem__(self, key: str) -> Colour: ...

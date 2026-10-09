@@ -17,7 +17,8 @@ from enum import StrEnum
 
 import pygame as pg
 
-from ._base_elem import Element
+from james._base_elem import Element
+from james._custom_types import DrawFunc, SupportsGetItemColour
 
 
 class HAlign(StrEnum):
@@ -48,6 +49,10 @@ class _Box(Element):
 
     def add_child(self, child: Element) -> None:
         self.children.append(child)
+
+    def draw_children(self, surface: pg.Surface, renderer: DrawFunc, theme: SupportsGetItemColour) -> None:
+        for child in self.children:
+            renderer(surface, child, theme)
 
 class HBox(_Box):
     """Horizontal box"""
