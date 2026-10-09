@@ -19,7 +19,7 @@ from typing import Any
 
 import pygame as pg
 
-from james._internals.custom_types import Colour, SupportsGetItemColour
+from james._internals.custom_types import Colour, SupportsGetItemColour, IntCoord2
 from james._internals.img_cache import img_cache
 from james._internals.base_elem import Element
 from james.utils import get_text_surf, resize_to_fit
@@ -59,13 +59,14 @@ class _Button(Element):
         return text_size[0] + self.inset * 2, text_size[1] + self.inset * 2
 
     @abstractmethod
-    def check_click(self, mouse_pos: tuple[int, int]) -> bool:
+    def check_overlaps(self, pos: IntCoord2) -> bool:
+        """Check if a specific position overlaps with the 'hitbox' of the button."""
         raise NotImplementedError
 
 
 class RectButton(_Button):
-    def check_click(self, mouse_pos: tuple[int, int]) -> bool:
-        return self.rect.collidepoint(mouse_pos)
+    def check_overlaps(self, pos: tuple[int, int]) -> bool:
+        return self.rect.collidepoint(pos)
 
     def preferred_size(self) -> tuple[int, int]:
         return self.fixed_size or self._get_text_inset_size()
@@ -154,11 +155,11 @@ class CircleButton(_Button):
 
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         self.draw_primitive(surface, theme)
-        self.draw_default(surface, theme)
+        self.draw_default_border(surface, theme)
 
-    def check_click(self, mouse_pos: tuple[int, int]) -> bool:
-        dx = mouse_pos[0] - self.rect.centerx
-        dy = mouse_pos[1] - self.rect.centery
+    def check_overlaps(self, pos: tuple[int, int]) -> bool:
+        dx = pos[0] - self.rect.centerx
+        dy = pos[1] - self.rect.centery
         return dx ** 2 + dy ** 2 <= self.r ** 2
 
     def preferred_size(self) -> tuple[int, int]:
