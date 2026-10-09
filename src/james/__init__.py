@@ -29,7 +29,8 @@ from . import (
     scrollable_display,
     spacer
 )
-from james._internals import base_elem, custom_types
+
+from ._internals import base_elem, custom_types
 
 
 SupportsGetItemColour = custom_types.SupportsGetItemColour
