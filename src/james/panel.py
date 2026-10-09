@@ -31,13 +31,15 @@ class Panel(Element):
             child: Element | None = None,
             k_bg: str | None = None,
             k_border: str | None = None,
-            border_w: int = 0
+            border_w: int = 0,
+            renderer: DrawFunc
         ) -> None:
         super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours)
         self.horiz_padding = horiz_padding
         self.vert_padding = vert_padding
         self.child = child
         self.children = [child] if child is not None else []
+        self.renderer = renderer
 
         self.k_bg = k_bg
         self.k_border = k_border
@@ -60,6 +62,10 @@ class Panel(Element):
     def draw_default_border(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         if self.border_w and self.k_border is not None:
             pg.draw.rect(surface, theme[self.k_border], self.rect, self.border_w)
+
+    def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        self.draw_primitive(surface, theme, renderer=self.renderer)
+        self.draw_default_border(surface, theme)
 
     def layout(self, rect: pg.Rect) -> None:
         self.rect = rect

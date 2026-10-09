@@ -139,7 +139,7 @@ class InputBox(Element):
         surface.blit(text_surf, dest, source_rect)
 
     def draw_default_border(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
-        if self.k_border is not None:
+        if self.border_w and self.k_border is not None:
             pg.draw.rect(surface, theme[self.k_border], self.rect, self.border_w)
 
     def draw_cursor(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
@@ -199,6 +199,12 @@ class InputBox(Element):
 
         if self.border_w and self.k_border is not None:
             pg.draw.rect(surface, self.k_border, rect, self.border_w)
+
+    def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        self.draw_primitive(surface, theme)
+        self.draw_cursor(surface, theme)
+        self.draw_default_border(surface, theme)
+        self.draw_tooltip_with_default_border(surface, theme)
 
     def preferred_size(self) -> tuple[int, int]:
         return (0, self.font.get_height() + 2 * self.inset)

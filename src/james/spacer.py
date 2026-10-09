@@ -13,9 +13,10 @@
 # limitations under the License.
 
 
-from pygame import Rect
+from pygame import Rect, Surface
 
 from james._internals.base_elem import Element
+from james._internals.custom_types import SupportsGetItemColour
 
 
 class Spacer(Element):
@@ -29,3 +30,7 @@ class Spacer(Element):
 
     def layout(self, rect: Rect) -> None:
         self.rect = rect
+
+    def draw_default(self, surface: Surface, theme: SupportsGetItemColour) -> None:
+        """Draws nothing, as a Spacer is invisible."""
+        pass

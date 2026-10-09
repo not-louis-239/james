@@ -100,6 +100,10 @@ class ScrollableDisplay(Element):
         if self.border_w and self.k_border is not None:
             pg.draw.rect(surface, theme[self.k_border], self.rect, width=self.border_w)
 
+    def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        self.draw_primitive(surface, theme)
+        self.draw_default_border(surface, theme)
+
     def preferred_size(self) -> tuple[int, int]:
         cw, ch = self.child.preferred_size()
         return cw + 2 * self.padding, ch + 2 * self.padding

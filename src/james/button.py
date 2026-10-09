@@ -98,6 +98,11 @@ class RectButton(_Button):
         if self.k_border_colour is not None and self.border_w:
             pg.draw.rect(surface, theme[self.k_border_colour], self.rect, self.border_w)
 
+    def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        self.draw_primitive(surface, theme)
+        self.draw_default_border(surface, theme)
+
+
 class CircleButton(_Button):
     def __init__(
             self, *, r: int, flex: float = 0,
@@ -146,6 +151,10 @@ class CircleButton(_Button):
         """Draws a default circular button border."""
         if self.k_border_colour is not None and self.border_w:
             pg.draw.circle(surface, theme[self.k_border_colour], self.rect.center, self.r, width=self.border_w)
+
+    def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        self.draw_primitive(surface, theme)
+        self.draw_default(surface, theme)
 
     def check_click(self, mouse_pos: tuple[int, int]) -> bool:
         dx = mouse_pos[0] - self.rect.centerx

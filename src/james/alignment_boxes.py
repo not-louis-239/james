@@ -35,13 +35,14 @@ class VAlign(StrEnum):
 class _Box(Element):
     """Generic base class to store attributes common to both `HBox`es and `VBox`es"""
 
-    def __init__(self, *children: Element, padding: int = 0, gap: int = 0) -> None:
+    def __init__(self, *children: Element, padding: int = 0, gap: int = 0, renderer: DrawFunc) -> None:
         """Initialises a new box.
         padding = space between the box's edge and the first or last child
         gap     = space between children in the box"""
         super().__init__()
         self.padding = padding
         self.gap = gap
+        self.renderer = renderer
 
         if children is not None:
             for child in children:
@@ -50,9 +51,9 @@ class _Box(Element):
     def add_child(self, child: Element) -> None:
         self.children.append(child)
 
-    def draw_children(self, surface: pg.Surface, renderer: DrawFunc, theme: SupportsGetItemColour) -> None:
+    def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         for child in self.children:
-            renderer(surface, child, theme)
+            self.renderer(surface, child, theme)
 
 class HBox(_Box):
     """Horizontal box"""
@@ -188,10 +189,11 @@ class SBox(_Box):
     def __init__(
             self, child: Element, *,
             forced_width: int | None = None, forced_height: int | None = None,
+            renderer: DrawFunc,
             h_align: HAlign = HAlign.CENTRE,
             v_align: VAlign = VAlign.CENTRE
         ) -> None:
-        super().__init__()
+        super().__init__(renderer=renderer)
         self.child = child
         self.children = [child]
 
