@@ -72,8 +72,9 @@ class _Button(Element):
     # XXX: check_overlaps() will currently break if a _Button is inside of a
     # ScrollableDisplay or any other type of element where the apparent visual position
     # is variable.
+
     # To fix this, one would need to make an Element keep track of its parent,
-    # walk up the parent chain and account for any adjustments.
+    # walk up the parent chain and account for any visual position offsets due to scrolling.
     # But I can't be bothered to implement that yet.
 
     @abstractmethod

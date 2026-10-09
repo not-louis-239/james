@@ -20,6 +20,7 @@ import pygame as pg
 
 from james._internals.custom_types import Colour, IntCoord2
 from james._internals.constants import DUMMY_BLACK
+from james._internals.base_elem import Element
 
 
 @dataclass(kw_only=True)
@@ -158,3 +159,19 @@ def make_tinted_scaled_surface(surface: pg.Surface, colour: Colour, size: IntCoo
 
     return tinted
 
+def dfs(root_elem: Element) -> list[Element]:
+    """Run DFS on the `root_elem` to find all of its children.
+    This also represents the draw order of elements from earliest to latest."""
+
+    result: list[Element] = []
+    stack = [root_elem]
+
+    while stack:
+        current = stack.pop()
+        result.append(current)
+
+        # Push children in reverse order so the first child is popped first
+        for child in reversed(current.children):
+            stack.append(child)
+
+    return result
