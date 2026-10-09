@@ -40,12 +40,16 @@ class InputBox(Element):
             sentinel_text: str = "",
             fixed_tooltip_w: int | None = None,
             border_w: int = 0,
-            k_bg: str | None = None,
+            k_bg_colour: str | None = None,
+            k_bg_hovered: str | None = None,
             k_bg_active: str | None = None,
-            k_fg: str,
+            k_fg_colour: str,
+            k_fg_hovered: str | None = None,
             k_fg_active: str | None = None,
+            k_border_colour: str | None = None,
+            k_border_hovered: str | None = None,
+            k_border_active: str | None = None,
             k_cursor: str,
-            k_border: str | None = None,
             k_sentinel: str | None = None
         ) -> None:
         super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours)
@@ -58,16 +62,48 @@ class InputBox(Element):
         self.fixed_tooltip_w = fixed_tooltip_w
         self.border_w = border_w
 
-        self.k_bg = k_bg
-        self.k_bg_active = k_bg_active
-        self.k_fg = k_fg
-        self.k_fg_active = k_fg_active if k_fg_active is not None else k_fg
+        self.k_bg_colour = k_bg_colour
+        self.k_bg_hovered = k_bg_hovered if k_bg_hovered is not None else k_bg_colour
+        self.k_bg_active = k_bg_active if k_bg_active is not None else k_bg_colour
+
+        self.k_fg_colour = k_fg_colour
+        self.k_fg_hovered = k_fg_hovered if k_fg_hovered is not None else k_fg_colour
+        self.k_fg_active = k_fg_active if k_fg_active is not None else k_fg_colour
+
+        self.k_border_colour = k_border_colour
+        self.k_border_hovered = k_border_hovered if k_border_hovered is not None else k_border_colour
+        self.k_border_active = k_border_active if k_border_active is not None else k_border_colour
+
         self.k_cursor = k_cursor
-        self.k_border = k_border
-        self.k_sentinel = k_sentinel
+        self.k_sentinel = k_sentinel if k_sentinel is not None else self.k_fg
 
         self.delete_timer = self.DELETE_DELAY
         self.cursor_flash_time = 0
+
+    @property
+    def k_bg(self) -> str | None:
+        return (
+            self.k_bg_active if self.active
+            else self.k_bg_hovered if self.rect.collidepoint(pg.mouse.get_pos())
+            else self.k_bg_colour
+        )
+
+    @property
+    def k_fg(self) -> str:
+        return (
+            self.k_sentinel if not self.text
+            else self.k_fg_active if self.active
+            else self.k_fg_hovered if self.rect.collidepoint(pg.mouse.get_pos())
+            else self.k_fg_colour
+        )
+
+    @property
+    def k_border(self) -> str | None:
+        return (
+            self.k_border_active if self.active
+            else self.k_border_hovered if self.rect.collidepoint(pg.mouse.get_pos())
+            else self.k_border_colour
+        )
 
     def set_tooltip(self, msg: str | None = None) -> None:
         self.tooltip_msg = msg
@@ -111,16 +147,13 @@ class InputBox(Element):
         """Draw to a surface a basic solid background,
         and the text to be rendered, cropped to fit within the input box."""
 
-        k_bg = self.k_bg_active if self.active else self.k_bg
-        k_fg = self.k_sentinel if not self.text else self.k_fg_active if self.active else self.k_fg
-
         # Background
-        if k_bg is not None:
-            pg.draw.rect(surface, theme[k_bg], self.rect)
+        if self.k_bg is not None:
+            pg.draw.rect(surface, theme[self.k_bg], self.rect)
 
         # Text - rendering only last 255 chars for performance
         text = self.text[-255:] if self.text else self.sentinel_text
-        text_surf = get_text_surf(self.font, text, k_fg)
+        text_surf = get_text_surf(self.font, text, self.k_fg)
         text_visual_width = self.rect.width - 2 * self.inset
 
         # Draw the text aligned to left-centre
@@ -187,7 +220,7 @@ class InputBox(Element):
         # Draw text
         font_h = self.font.get_height()
         for lineno, line in enumerate(lines):
-            surface.blit(get_text_surf(self.font, line, self.k_fg), (start_x, start_y + font_h * lineno))
+            surface.blit(get_text_surf(self.font, line, theme[self.k_fg]), (start_x, start_y + font_h * lineno))
 
         return lines, rect
 
