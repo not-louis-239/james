@@ -50,6 +50,7 @@ class _Box(Element):
 
     def add_child(self, child: Element) -> None:
         self.children.append(child)
+        child.parent = self
 
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         for child in self.children:

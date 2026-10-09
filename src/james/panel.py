@@ -37,7 +37,11 @@ class Panel(Element):
         super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours)
         self.horiz_padding = horiz_padding
         self.vert_padding = vert_padding
+
         self.child = child
+        if child is not None:
+            child.parent = self
+
         self.children = [child] if child is not None else []
         self.renderer = renderer
 

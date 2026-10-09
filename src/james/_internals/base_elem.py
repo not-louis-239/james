@@ -32,7 +32,10 @@ class Element(ABC):
         ) -> None:
         self.flex = flex
         self.rect = pg.Rect(0, 0, 0, 0)
+
         self.children: list[Element] = []
+        self.parent: Element | None = None
+
         self.visible: bool = True
         self.active: bool = False
 
@@ -56,6 +59,20 @@ class Element(ABC):
 
         self.draw_attrs = draw_attrs or {}
         self.colours = colours or {}
+
+    @property
+    def parents(self) -> list[Element]:
+        """Return the `Element`'s parent `Element`s."""
+
+        parents: list[Element] = []
+        x = self
+
+        # Walk up the parent tree until we find an element with no parent
+        while x.parent is not None:
+            parents.append(x.parent)
+            x = x.parent
+
+        return parents
 
     @abstractmethod
     def preferred_size(self) -> tuple[int, int]:

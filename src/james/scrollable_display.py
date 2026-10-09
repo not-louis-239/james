@@ -40,9 +40,12 @@ class ScrollableDisplay(Element):
         ) -> None:
         super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours)
         self.padding = padding
-        self.child = child
 
+        self.child = child
         self.children = [child]
+        if child is not None:
+            child.parent = self
+
         self.internal_surface = DUMMY_SURFACE
         self.internal_rect = pg.Rect(0, 0, 0, 0)
         self.physics = ScrollPhysics(disp_topleft=(0, 0), disp_botright=(0, 0))
