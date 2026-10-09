@@ -13,11 +13,14 @@
 # limitations under the License.
 
 
+from typing import TYPE_CHECKING
+
 from typing import Callable
 
 from pygame import Surface
 
-from james._base_elem import Element
+if TYPE_CHECKING:
+    from james._base_elem import Element
 
 
 type Colour = tuple[int, int, int]
