@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING, Protocol, Callable
 from pygame import Surface
 
 if TYPE_CHECKING:
-    from james._base_elem import Element
+    from james._internals.base_elem import Element
 
 
 type Colour = tuple[int, int, int]

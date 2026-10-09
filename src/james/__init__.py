@@ -21,7 +21,6 @@ UI library for pygame, designed to be modular and easy to use.
 
 
 from . import (
-    _base_elem,
     alignment_boxes,
     button,
     input_box,
@@ -30,8 +29,10 @@ from . import (
     scrollable_display,
     spacer
 )
+from james._internals import base_elem
 
-Element = _base_elem.Element
+
+Element = base_elem.Element
 
 HBox = alignment_boxes.HBox
 VBox = alignment_boxes.VBox

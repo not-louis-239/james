@@ -15,7 +15,7 @@
 
 from pygame import Rect
 
-from ._base_elem import Element
+from james._internals.base_elem import Element
 
 
 class Spacer(Element):

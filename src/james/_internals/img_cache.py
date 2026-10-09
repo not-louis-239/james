@@ -17,7 +17,7 @@ from pathlib import Path
 
 import pygame as pg
 
-from james._custom_types import Colour, IntCoord2
+from james._internals.custom_types import Colour, IntCoord2
 from james.utils import make_tinted_scaled_surface
 
 

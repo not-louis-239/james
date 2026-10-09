@@ -19,11 +19,10 @@ from typing import Any
 
 import pygame as pg
 
-from james._custom_types import Colour, SupportsGetItemColour
-from james._img_cache import img_cache
+from james._internals.custom_types import Colour, SupportsGetItemColour
+from james._internals.img_cache import img_cache
+from james._internals.base_elem import Element
 from james.utils import get_text_surf, resize_to_fit
-
-from ._base_elem import Element
 
 
 class _Button(Element):

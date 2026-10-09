@@ -17,8 +17,8 @@ from enum import StrEnum
 
 import pygame as pg
 
-from james._base_elem import Element
-from james._custom_types import DrawFunc, SupportsGetItemColour
+from james._internals.base_elem import Element
+from james._internals.custom_types import DrawFunc, SupportsGetItemColour
 
 
 class HAlign(StrEnum):

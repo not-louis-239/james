@@ -21,7 +21,7 @@ from abc import ABC, abstractmethod
 import pygame as pg
 
 
-from ._custom_types import Colour
+from .custom_types import Colour, SupportsGetItemColour
 
 
 class Element(ABC):
@@ -66,4 +66,10 @@ class Element(ABC):
     def layout(self, rect: pg.Rect) -> None:
         """Assign the rect to `self` and divide space between
         any potential children of `self`."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        """Default draw behaviour. You can use this or make your
+        own draw function if you need specialised behaviour."""
         raise NotImplementedError

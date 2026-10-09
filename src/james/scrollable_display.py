@@ -18,10 +18,10 @@ import pygame as pg
 
 from typing import Any
 
-from james._constants import DUMMY_SURFACE
+from james._internals.constants import DUMMY_SURFACE
 from james.scroll_physics import ScrollPhysics
-from james._base_elem import Element
-from james._custom_types import Colour, DrawFunc, SupportsGetItemColour
+from james._internals.base_elem import Element
+from james._internals.custom_types import Colour, DrawFunc, SupportsGetItemColour
 
 
 class ScrollableDisplay(Element):

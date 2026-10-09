@@ -17,9 +17,9 @@ import pygame as pg
 
 from typing import Any
 
-from james._custom_types import Colour, SupportsGetItemColour
+from james._internals.custom_types import Colour, SupportsGetItemColour
 from james.utils import crop_text_to_fit, get_text_surf
-from ._base_elem import Element
+from james._internals.base_elem import Element
 
 
 class Label(Element):

@@ -18,10 +18,8 @@ from dataclasses import dataclass
 
 import pygame as pg
 
-from james._custom_types import IntCoord2
-
-from ._custom_types import Colour
-from ._constants import DUMMY_BLACK
+from james._internals.custom_types import Colour, IntCoord2
+from james._internals.constants import DUMMY_BLACK
 
 
 @dataclass(kw_only=True)
