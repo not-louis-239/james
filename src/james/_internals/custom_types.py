@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from typing import TYPE_CHECKING, Protocol, Callable
+from typing import TYPE_CHECKING, Protocol, Callable, Any
 
 from pygame import Surface
 
@@ -27,4 +27,4 @@ type IntCoord2 = tuple[int, int]  # e.g. (width, height)
 
 # something that can be indexed like obj[str] to return a Colour
 class SupportsGetItemColour(Protocol):
-    def __getitem__(self, key: str) -> Colour: ...
+    def __getitem__(self, key: Any) -> Colour: ...
