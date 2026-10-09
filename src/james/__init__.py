@@ -13,8 +13,11 @@
 # limitations under the License.
 
 
-# James - 'Just A Modular Element Structurer'
-# UI library for pygame, designed to be modular and easy to use.
+"""
+James - 'Just A Modular Element Structurer'
+
+UI library for pygame, designed to be modular and easy to use.
+"""
 
 
 from . import (
