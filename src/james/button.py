@@ -182,6 +182,13 @@ class CircleButton(_Button):
         )
         self.r = r
 
+    def check_overlaps(self, pos: tuple[int, int]) -> bool:
+        if self.disabled:
+            return False
+        dx = pos[0] - self.rect.centerx
+        dy = pos[1] - self.rect.centery
+        return dx ** 2 + dy ** 2 <= self.r ** 2
+
     def draw_primitive(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         """Draws a primitive, borderless circular button."""
 
@@ -210,13 +217,6 @@ class CircleButton(_Button):
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         self.draw_primitive(surface, theme)
         self.draw_default_border(surface, theme)
-
-    def check_overlaps(self, pos: tuple[int, int]) -> bool:
-        if self.disabled:
-            return False
-        dx = pos[0] - self.rect.centerx
-        dy = pos[1] - self.rect.centery
-        return dx ** 2 + dy ** 2 <= self.r ** 2
 
     def preferred_size(self) -> tuple[int, int]:
         return (2 * self.r, 2 * self.r)

@@ -123,6 +123,9 @@ class InputBox(Element):
     def handle_input(self, keys: pg.key.ScancodeWrapper, events: list[pg.event.Event], dt_s: float) -> bool:
         """Handles user input and returns True if `self`'s contents were changed."""
 
+        if self.disabled:
+            return False
+
         old_contents = self.text
 
         # Cursor flash time
