@@ -15,11 +15,10 @@
 
 from __future__ import annotations
 
-from typing import Any
 from abc import ABC, abstractmethod
+from typing import Any
 
 import pygame as pg
-
 
 from .custom_types import Colour, SupportsGetItemColour
 

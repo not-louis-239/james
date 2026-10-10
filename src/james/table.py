@@ -13,12 +13,12 @@
 # limitations under the License.
 
 
-import pygame as pg
-
 from typing import Any
 
+import pygame as pg
+
 from james._internals.base_elem import Element
-from james._internals.custom_types import SupportsGetItemColour, DrawFunc
+from james._internals.custom_types import DrawFunc, SupportsGetItemColour
 from james.alignment_boxes import HBox
 
 

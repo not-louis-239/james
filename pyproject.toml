@@ -7,7 +7,7 @@ name = "james"
 version = "0.2.2"
 description = "pygame ui library"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 authors = [{ name = "Louis Masarei-Boulton" }]
 dependencies = [
     "pygame-ce>=2.5.8"

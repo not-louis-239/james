@@ -27,11 +27,10 @@ from . import (
     label,
     panel,
     scrollable_display,
-    spacer
+    spacer,
+    table,
 )
-
 from ._internals import base_elem, custom_types
-
 
 SupportsGetItemColour = custom_types.SupportsGetItemColour
 
@@ -40,6 +39,7 @@ Element = base_elem.Element
 HBox = alignment_boxes.HBox
 VBox = alignment_boxes.VBox
 SBox = alignment_boxes.SBox
+Table = table.Table
 
 RectButton = button.RectButton
 CircleButton = button.CircleButton

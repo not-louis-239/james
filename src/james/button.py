@@ -19,9 +19,9 @@ from typing import Any
 
 import pygame as pg
 
-from james._internals.custom_types import Colour, SupportsGetItemColour, IntCoord2
-from james._internals.img_cache import img_cache
 from james._internals.base_elem import Element
+from james._internals.custom_types import Colour, IntCoord2, SupportsGetItemColour
+from james._internals.img_cache import img_cache
 from james.utils import get_text_surf, resize_to_fit
 
 
@@ -52,7 +52,7 @@ class _Button(Element):
 
         self.k_bg_colour = k_bg_colour
         self.k_bg_hovered = k_bg_hovered if k_bg_hovered is not None else k_bg_colour
-        self.k_bg_clicked = k_bg_clicked if k_bg_clicked is not None else k_bg_clicked
+        self.k_bg_clicked = k_bg_clicked if k_bg_clicked is not None else k_bg_colour
 
         self.k_fg_colour = k_fg_colour
         self.k_fg_hovered = k_fg_hovered if k_fg_hovered is not None else k_fg_colour

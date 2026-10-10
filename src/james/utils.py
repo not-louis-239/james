@@ -13,14 +13,14 @@
 # limitations under the License.
 
 
-from functools import lru_cache
 from dataclasses import dataclass
+from functools import lru_cache
 
 import pygame as pg
 
-from james._internals.custom_types import Colour, IntCoord2
-from james._internals.constants import DUMMY_BLACK
 from james._internals.base_elem import Element
+from james._internals.constants import DUMMY_BLACK
+from james._internals.custom_types import Colour, IntCoord2
 
 
 @dataclass(kw_only=True)
@@ -171,7 +171,6 @@ def dfs(root_elem: Element) -> list[Element]:
         result.append(current)
 
         # Push children in reverse order so the first child is popped first
-        for child in reversed(current.children):
-            stack.append(child)
+        stack.extend(reversed(current.children))
 
     return result

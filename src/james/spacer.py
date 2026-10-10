@@ -20,7 +20,7 @@ from james._internals.custom_types import SupportsGetItemColour
 
 
 class Spacer(Element):
-    def __init__(self, *, flex: float = 0.0, min_w: int = 0, min_h: int = 0) -> None:
+    def __init__(self, *, flex: float = 1.0, min_w: int = 0, min_h: int = 0) -> None:
         super().__init__(flex=flex)
         self.min_w = min_w
         self.min_h = min_h
@@ -33,4 +33,3 @@ class Spacer(Element):
 
     def draw_default(self, surface: Surface, theme: SupportsGetItemColour) -> None:
         """Draws nothing, as a Spacer is invisible."""
-        pass
