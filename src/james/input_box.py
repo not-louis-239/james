@@ -155,7 +155,7 @@ class InputBox(Element):
 
         # Text - rendering only last 255 chars for performance
         text = self.text[-255:] if self.text else self.sentinel_text
-        text_surf = get_text_surf(self.font, text, self.k_fg)
+        text_surf = get_text_surf(self.font, text, theme[self.k_fg])
         text_visual_width = self.rect.width - 2 * self.inset
 
         # Draw the text aligned to left-centre
@@ -233,7 +233,7 @@ class InputBox(Element):
         _, rect = self.draw_tooltip(surface, theme)
 
         if self.border_w and self.k_border is not None:
-            pg.draw.rect(surface, self.k_border, rect, self.border_w)
+            pg.draw.rect(surface, theme[self.k_border], rect, self.border_w)
 
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         self.draw_primitive(surface, theme)
