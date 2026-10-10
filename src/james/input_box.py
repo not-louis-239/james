@@ -180,9 +180,14 @@ class InputBox(Element):
     def draw_cursor(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         # Draw the cursor
         if self.active and self.cursor_flash_time < self.CURSOR_FLASH_INTERVAL * 0.5:
-            cursor_x = self.rect.x + self.inset + (0 if not self.text else min(self.CURSOR_VISUAL_W, surface.get_width()))
-            cursor_top_y = self.rect.centery - surface.get_height() // 2
-            cursor_bot_y = self.rect.centery + surface.get_height() // 2
+            cursor_x = self.rect.x + self.inset + (
+                0 if not self.text else min(
+                    self.rect.width - 2 * self.inset,
+                    self.font.size(self.text)[0]
+                )
+            )
+            cursor_top_y = self.rect.centery - self.font.get_height() // 2
+            cursor_bot_y = self.rect.centery + self.font.get_height() // 2
             pg.draw.line(surface, theme[self.k_cursor], (cursor_x, cursor_top_y), (cursor_x, cursor_bot_y), width=self.CURSOR_VISUAL_W)
 
     def _tooltip_lines_and_rect(self) -> tuple[list[str], pg.Rect]:
