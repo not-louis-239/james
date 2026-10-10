@@ -77,7 +77,7 @@ class InputBox(Element):
         self.k_border_active = k_border_active if k_border_active is not None else k_border_colour
 
         self.k_cursor = k_cursor
-        self.k_sentinel = k_sentinel if k_sentinel is not None else self.k_fg
+        self.k_sentinel = k_sentinel if k_sentinel is not None else self.k_fg_colour
 
         self.delete_timer = self.DELETE_DELAY
         self.cursor_flash_time = 0
