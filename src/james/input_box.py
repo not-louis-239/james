@@ -53,6 +53,8 @@ class InputBox(Element):
             k_sentinel: str | None = None
         ) -> None:
         super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours)
+
+        self.text = ""
         self.font = font
         self.inset = inset
         self.active = False

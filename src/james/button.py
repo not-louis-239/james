@@ -34,13 +34,13 @@ class _Button(Element):
             fixed_size: tuple[int, int] | None = None, img_path: Path | None = None,
             k_bg_colour: str | None = None,
             k_bg_hovered: str | None = None,
-            k_bg_clicked: str | None = None,
+            k_bg_active: str | None = None,
             k_fg_colour: str,
             k_fg_hovered: str | None = None,
-            k_fg_clicked: str | None = None,
+            k_fg_active: str | None = None,
             k_border_colour: str | None = None,
             k_border_hovered: str | None = None,
-            k_border_clicked: str | None = None,
+            k_border_active: str | None = None,
             border_w: int = 0
         ) -> None:
         super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours)
@@ -52,15 +52,15 @@ class _Button(Element):
 
         self.k_bg_colour = k_bg_colour
         self.k_bg_hovered = k_bg_hovered if k_bg_hovered is not None else k_bg_colour
-        self.k_bg_clicked = k_bg_clicked if k_bg_clicked is not None else k_bg_colour
+        self.k_bg_active = k_bg_active if k_bg_active is not None else k_bg_colour
 
         self.k_fg_colour = k_fg_colour
         self.k_fg_hovered = k_fg_hovered if k_fg_hovered is not None else k_fg_colour
-        self.k_fg_clicked = k_fg_clicked if k_fg_clicked is not None else k_fg_colour
+        self.k_fg_active = k_fg_active if k_fg_active is not None else k_fg_colour
 
         self.k_border_colour = k_border_colour
         self.k_border_hovered = k_border_hovered if k_border_hovered is not None else k_border_colour
-        self.k_border_clicked = k_border_clicked if k_border_clicked is not None else k_border_colour
+        self.k_border_active = k_border_active if k_border_active is not None else k_border_colour
 
         self.border_w = border_w
 
@@ -93,7 +93,7 @@ class _Button(Element):
     @property
     def k_bg(self) -> str | None:
         return (
-            self.k_bg_clicked if self.check_held()
+            self.k_bg_active if self.check_held()
             else self.k_bg_hovered if self.check_hovered()
             else self.k_bg_colour
         )
@@ -101,7 +101,7 @@ class _Button(Element):
     @property
     def k_fg(self) -> str | None:
         return (
-            self.k_fg_clicked if self.check_held()
+            self.k_fg_active if self.check_held()
             else self.k_fg_hovered if self.check_hovered()
             else self.k_fg_colour
         )
@@ -109,7 +109,7 @@ class _Button(Element):
     @property
     def k_border(self) -> str | None:
         return (
-            self.k_border_clicked if self.check_held()
+            self.k_border_active if self.check_held()
             else self.k_border_hovered if self.check_hovered()
             else self.k_border_colour
         )
@@ -161,22 +161,22 @@ class CircleButton(_Button):
             fixed_size: tuple[int, int] | None = None, img_path: Path | None = None,
             k_bg_colour: str | None = None,
             k_bg_hovered: str | None = None,
-            k_bg_clicked: str | None = None,
+            k_bg_active: str | None = None,
             k_fg_colour: str,
             k_fg_hovered: str | None = None,
-            k_fg_clicked: str | None = None,
+            k_fg_active: str | None = None,
             k_border_colour: str | None = None,
             k_border_hovered: str | None = None,
-            k_border_clicked: str | None = None,
+            k_border_active: str | None = None,
             border_w: int = 0
         ) -> None:
         super().__init__(
             flex=flex, draw_attrs=draw_attrs, colours=colours,
             text=text, font=font, inset=inset, fixed_size=fixed_size, img_path=img_path,
-            k_bg_colour=k_bg_colour, k_bg_hovered=k_bg_hovered, k_bg_clicked=k_bg_clicked,
-            k_fg_colour=k_fg_colour, k_fg_hovered=k_fg_hovered, k_fg_clicked=k_fg_clicked,
+            k_bg_colour=k_bg_colour, k_bg_hovered=k_bg_hovered, k_bg_active=k_bg_active,
+            k_fg_colour=k_fg_colour, k_fg_hovered=k_fg_hovered, k_fg_active=k_fg_active,
             k_border_colour=k_border_colour, k_border_hovered=k_border_hovered,
-            k_border_clicked=k_border_clicked, border_w=border_w
+            k_border_active=k_border_active, border_w=border_w
         )
         self.r = r
 
