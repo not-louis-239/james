@@ -117,6 +117,8 @@ class _Button(Element):
 
 class RectButton(_Button):
     def check_overlaps(self, pos: tuple[int, int]) -> bool:
+        if self.disabled:
+            return False
         return self.rect.collidepoint(pos)
 
     def preferred_size(self) -> tuple[int, int]:
@@ -189,7 +191,10 @@ class CircleButton(_Button):
 
         # Draw icon, but bound to the button circle
         if self.img_path is not None:
-            img_surf = img_cache.get_tinted_scaled_img(self.img_path, theme[self.k_fg], self.preferred_size())
+            img_surf = img_cache.get_tinted_scaled_img(
+                self.img_path, theme[self.k_fg], self.preferred_size(),
+                constrain_proportions=True
+            )
             surface.blit(img_surf, img_surf.get_rect(center=self.rect.center))
 
         # Draw the text
@@ -207,6 +212,8 @@ class CircleButton(_Button):
         self.draw_default_border(surface, theme)
 
     def check_overlaps(self, pos: tuple[int, int]) -> bool:
+        if self.disabled:
+            return False
         dx = pos[0] - self.rect.centerx
         dy = pos[1] - self.rect.centery
         return dx ** 2 + dy ** 2 <= self.r ** 2

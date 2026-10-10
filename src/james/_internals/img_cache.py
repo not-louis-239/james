@@ -18,7 +18,7 @@ from pathlib import Path
 import pygame as pg
 
 from james._internals.custom_types import Colour, IntCoord2
-from james.utils import make_tinted_scaled_surface
+from james.utils import make_tinted_scaled_surface, resize_to_fit
 
 type _TintSizeCtx = tuple[Path, Colour, IntCoord2]    # file path, tint, scale
 type _TintSizeCache = dict[_TintSizeCtx, pg.Surface]  # {(colour, size): tinted_surface}
@@ -37,17 +37,22 @@ class _ImageCache:
             self.base_cache[fp] = pg.image.load(fp).convert_alpha()
         return self.base_cache[fp]
 
-    def get_tinted_scaled_img(self, fp: Path, colour: Colour, size: IntCoord2) -> pg.Surface:
+    def get_tinted_scaled_img(self, fp: Path, colour: Colour, size: IntCoord2, constrain_proportions: bool = False) -> pg.Surface:
         """Get an image from the path `fp`, tinted and scaled to a specific
-        `colour` and `size`."""
+        `colour` and `size`. With `constrain_proportions`, scales the image to fit inside
+        a `size`-sized bounding box instead."""
+
+        # Get the base cache first
+        if fp not in self.base_cache:
+            self.base_cache[fp] = pg.image.load(fp).convert_alpha()
+
+        if constrain_proportions:
+            x, y = resize_to_fit(self.base_cache[fp].get_size(), size)
+            size = int(x), int(y)
 
         key: _TintSizeCtx = (fp, colour, size)
 
         if key not in self.tint_scale_cache:
-            # Get the base cache first
-            if fp not in self.base_cache:
-                self.base_cache[fp] = pg.image.load(fp).convert_alpha()
-
             self.tint_scale_cache[key] = make_tinted_scaled_surface(
                 surface=self.base_cache[fp], colour=colour,
                 size=size if size != self.base_cache[fp].get_size() else None  # skip resizing if the requested size is the same as the original size

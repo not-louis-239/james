@@ -21,6 +21,7 @@ UI library for pygame, designed to be modular and easy to use.
 
 
 from . import (
+    utils,
     alignment_boxes,
     button,
     input_box,
@@ -32,9 +33,15 @@ from . import (
 )
 from ._internals import base_elem, custom_types
 
+
+AmbientMessage = utils.AmbientMessage
+
 SupportsGetItemColour = custom_types.SupportsGetItemColour
 
 Element = base_elem.Element
+
+HAlign = alignment_boxes.HAlign
+VAlign = alignment_boxes.VAlign
 
 HBox = alignment_boxes.HBox
 VBox = alignment_boxes.VBox

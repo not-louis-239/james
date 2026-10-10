@@ -40,6 +40,9 @@ class InputBox(Element):
             sentinel_text: str = "",
             fixed_tooltip_w: int | None = None,
             border_w: int = 0,
+            tooltip_inset: int | None = None,
+            tooltip_font: pg.font.Font | None = None,
+            k_tooltip: str | None = None,
             k_bg_colour: str | None = None,
             k_bg_hovered: str | None = None,
             k_bg_active: str | None = None,
@@ -54,7 +57,7 @@ class InputBox(Element):
         ) -> None:
         super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours)
 
-        self.text = ""
+        self.text: str = ""
         self.font = font
         self.inset = inset
         self.active = False
@@ -63,6 +66,10 @@ class InputBox(Element):
         self.tooltip_msg: str | None = None
         self.fixed_tooltip_w = fixed_tooltip_w
         self.border_w = border_w
+
+        self.tooltip_inset = tooltip_inset if tooltip_inset is not None else inset
+        self.tooltip_font = tooltip_font or font
+        self.k_tooltip = k_tooltip if k_tooltip is not None else k_fg_colour
 
         self.k_bg_colour = k_bg_colour
         self.k_bg_hovered = k_bg_hovered if k_bg_hovered is not None else k_bg_colour
@@ -113,7 +120,12 @@ class InputBox(Element):
     def clear_tooltip(self) -> None:
         self.set_tooltip(None)
 
-    def handle_input(self, keys: pg.key.ScancodeWrapper, events: list[pg.event.Event], dt_s: float) -> None:
+    def handle_input(self, keys: pg.key.ScancodeWrapper, events: list[pg.event.Event], dt_s: float) -> bool:
+        """Handles user input and returns True if `self`'s contents were changed."""
+
+        old_contents = self.text
+
+        # Cursor flash time
         if self.active:
             self.cursor_flash_time = (self.cursor_flash_time + dt_s) % self.CURSOR_FLASH_INTERVAL
         else:
@@ -144,6 +156,8 @@ class InputBox(Element):
         else:
             # If delete is not held down, reset the delete timer
             self.delete_timer = self.DELETE_DELAY
+
+        return self.text != old_contents
 
     def draw_primitive(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         """Draw to a surface a basic solid background,
@@ -200,51 +214,57 @@ class InputBox(Element):
         tooltip_w = self.fixed_tooltip_w or self.rect.w
 
         # Draw the text
-        lines = wrap_text(text=self.tooltip_msg, font=self.font, maxwidth=tooltip_w - 2 * self.inset)
-        font_h = self.font.get_height()
+        lines = wrap_text(text=self.tooltip_msg, font=self.tooltip_font, maxwidth=tooltip_w - 2 * self.tooltip_inset)
+        font_h = self.tooltip_font.get_height()
         text_height = font_h * len(lines)
 
         # Tooltip rect
-        tooltip_rect = pg.Rect(self.rect.left, self.rect.bottom, tooltip_w, text_height + 2 * self.inset)
+        tooltip_rect = pg.Rect(self.rect.left, self.rect.bottom, tooltip_w, text_height + 2 * self.tooltip_inset)
 
         return lines, tooltip_rect
 
-    def draw_tooltip(self, surface: pg.Surface, theme: SupportsGetItemColour) -> tuple[list[str], pg.Rect]:
-        """Draws a borderless tooltip. Returns the tooltip lines and rect in
-        case they need to be used again."""
-
-        lines, rect = self._tooltip_lines_and_rect()
-        if not self.tooltip_msg:
-            return lines, rect
-
-        start_x = self.rect.x + self.inset
-        start_y = self.rect.bottom + self.inset
+    def draw_tooltip_background(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        _, rect = self._tooltip_lines_and_rect()
 
         # Draw background
-        if self.k_bg is not None:
-            pg.draw.rect(surface, theme[self.k_bg], rect)
+        if self.k_bg_colour is not None:
+            pg.draw.rect(surface, theme[self.k_bg_colour], rect)
+
+    def draw_tooltip(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        """Draws borderless, colourless, tooltip text."""
+
+        if not self.tooltip_msg:
+            return
+
+        lines, _ = self._tooltip_lines_and_rect()
+
+        start_x = self.rect.x + self.tooltip_inset
+        start_y = self.rect.bottom + self.tooltip_inset
 
         # Draw text
-        font_h = self.font.get_height()
+        font_h = self.tooltip_font.get_height()
         for lineno, line in enumerate(lines):
-            surface.blit(get_text_surf(self.font, line, theme[self.k_fg]), (start_x, start_y + font_h * lineno))
+            surface.blit(get_text_surf(self.tooltip_font, line, theme[self.k_tooltip]), (start_x, start_y + font_h * lineno))
 
-        return lines, rect
-
-    def draw_tooltip_with_default_border(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
-        """Draws a tooltip with a default-style border for a tooltip
+    def draw_default_tooltip_border(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        """Draws a default-style border for `self`'s tooltip
         using `self.border_w` and `self.k_border` if set."""
 
-        _, rect = self.draw_tooltip(surface, theme)
+        _, rect = self._tooltip_lines_and_rect()
 
         if self.border_w and self.k_border is not None:
             pg.draw.rect(surface, theme[self.k_border], rect, self.border_w)
 
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        # Primitive
         self.draw_primitive(surface, theme)
         self.draw_cursor(surface, theme)
         self.draw_default_border(surface, theme)
-        self.draw_tooltip_with_default_border(surface, theme)
+
+        # Tooltip
+        self.draw_tooltip_background(surface, theme)
+        self.draw_tooltip(surface, theme)
+        self.draw_default_tooltip_border(surface, theme)
 
     def preferred_size(self) -> tuple[int, int]:
         return (0, self.font.get_height() + 2 * self.inset)

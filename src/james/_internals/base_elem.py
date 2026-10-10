@@ -35,8 +35,10 @@ class Element(ABC):
         self.children: list[Element] = []
         self.parent: Element | None = None
 
-        self.visible: bool = True
-        self.active: bool = False
+        # TODO: implement visibility affecting drawing
+        self.visible: bool = True  # should I be seen?
+        self.active: bool = True  # do I accept user input?
+        self.disabled: bool = False  # am I supposed to block user input?
 
         # These dicts are to allow implementation of custom draw functions
         # and attaching custom attributes for drawing and colouring

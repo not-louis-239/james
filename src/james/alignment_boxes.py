@@ -185,14 +185,17 @@ class VBox(_Box):
             y += h + self.gap
 
 class SBox(_Box):
-    """Sized box that gives its child a fixed-size slot, with alignment."""
+    """Sized box that gives its child a fixed-size slot, with alignment.
+    Without `strict`, `SBox` will only constrain an element.
+    With `strict`, `SBox` ignores the child's preferred size entirely."""
 
     def __init__(
             self, child: Element, *,
             forced_width: int | None = None, forced_height: int | None = None,
             renderer: DrawFunc,
             h_align: HAlign = HAlign.CENTRE,
-            v_align: VAlign = VAlign.CENTRE
+            v_align: VAlign = VAlign.CENTRE,
+            strict: bool = False
         ) -> None:
         super().__init__(renderer=renderer)
         self.child = child
@@ -202,6 +205,7 @@ class SBox(_Box):
         self.forced_height = forced_height
         self.h_align = h_align
         self.v_align = v_align
+        self.strict = strict
 
     def preferred_size(self) -> tuple[int, int]:
         # Ask the child what it wants, but override it if we have a forced constraint
@@ -211,8 +215,11 @@ class SBox(_Box):
         return (w, h)
 
     def layout(self, rect: pg.Rect) -> None:
-        child_w, child_h = self.child.preferred_size()
-        child_rect = pg.Rect(0, 0, min(child_w, rect.width), min(child_h, rect.height))
+        if self.strict:
+            child_rect = pg.Rect(0, 0, *rect.size)
+        else:
+            child_w, child_h = self.child.preferred_size()
+            child_rect = pg.Rect(0, 0, min(child_w, rect.width), min(child_h, rect.height))
 
         match self.h_align:
             case HAlign.LEFT:
