@@ -35,11 +35,11 @@ class VAlign(StrEnum):
 class _Box(Element):
     """Generic base class to store attributes common to both `HBox`es and `VBox`es"""
 
-    def __init__(self, *children: Element, padding: int = 0, gap: int = 0, renderer: DrawFunc) -> None:
+    def __init__(self, *children: Element, flex: float = 0.0, padding: int = 0, gap: int = 0, renderer: DrawFunc) -> None:
         """Initialises a new box.
         padding = space between the box's edge and the first or last child
         gap     = space between children in the box"""
-        super().__init__()
+        super().__init__(flex=flex)
         self.padding = padding
         self.gap = gap
         self.renderer = renderer

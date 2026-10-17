@@ -36,6 +36,7 @@ from ._internals import base_elem, custom_types
 
 AmbientMessage = utils.AmbientMessage
 
+Colour = custom_types.Colour
 SupportsGetItemColour = custom_types.SupportsGetItemColour
 
 Element = base_elem.Element
