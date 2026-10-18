@@ -20,7 +20,8 @@ from typing import Any
 
 import pygame as pg
 
-from .custom_types import Colour, SupportsGetItemColour
+from . import renderer as _renderer
+from .custom_types import Colour, SupportsGetItemColour, DrawFunc
 
 
 class Element(ABC):
@@ -60,6 +61,18 @@ class Element(ABC):
 
         self.draw_attrs = draw_attrs or {}
         self.colours = colours or {}
+
+    def _set_renderer(self, renderer: DrawFunc | None) -> None:
+        chosen = renderer or _renderer.DEFAULT_RENDERER
+        if chosen is None:
+            raise RuntimeError(
+                f"No renderer set for {type(self).__name__}. "
+                "Use set_default_renderer() to set one "
+                "or provide renderer= with a valid "
+                "draw function in the constructor."
+            )
+
+        self.renderer = chosen
 
     @property
     def parents(self) -> list[Element]:

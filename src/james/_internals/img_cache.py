@@ -17,7 +17,7 @@ from pathlib import Path
 
 import pygame as pg
 
-from james._internals.custom_types import Colour, IntCoord2
+from james.custom_types import Colour, IntCoord2
 from james.utils import make_tinted_scaled_surface, resize_to_fit
 
 type _TintSizeCtx = tuple[Path, Colour, IntCoord2]    # file path, tint, scale

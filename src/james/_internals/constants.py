@@ -15,7 +15,7 @@
 
 import pygame as pg
 
-__version__ = (0, 2, 4)
+__version__ = (0, 2, 5)
 
 
 # Well, you found something here!

@@ -17,8 +17,8 @@ from typing import Any
 
 import pygame as pg
 
-from james._internals.base_elem import Element
-from james._internals.custom_types import Colour, DrawFunc, SupportsGetItemColour
+from james.base_elem import Element
+from james.custom_types import Colour, DrawFunc, SupportsGetItemColour
 
 
 class Panel(Element):
@@ -32,7 +32,7 @@ class Panel(Element):
             k_bg: str | None = None,
             k_border: str | None = None,
             border_w: int = 0,
-            renderer: DrawFunc
+            renderer: DrawFunc | None = None
         ) -> None:
         super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours)
         self.horiz_padding = horiz_padding
@@ -43,7 +43,7 @@ class Panel(Element):
             child.parent = self
 
         self.children = [child] if child is not None else []
-        self.renderer = renderer
+        self._set_renderer(renderer)
 
         self.k_bg = k_bg
         self.k_border = k_border
@@ -55,20 +55,20 @@ class Panel(Element):
         cw, ch = self.child.preferred_size()
         return (cw + 2 * self.horiz_padding, ch + 2 * self.vert_padding)
 
-    def draw_primitive(self, surface: pg.Surface, theme: SupportsGetItemColour, renderer: DrawFunc) -> None:
+    def draw_primitive(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         """Draws a primitive panel background, followed by the Panel's child."""
         if self.k_bg is not None:
             pg.draw.rect(surface, theme[self.k_bg], self.rect)
 
         if self.child:
-            renderer(surface, self.child, theme)
+            self.renderer(surface, self.child, theme)
 
     def draw_default_border(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         if self.border_w and self.k_border is not None:
             pg.draw.rect(surface, theme[self.k_border], self.rect, self.border_w)
 
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
-        self.draw_primitive(surface, theme, renderer=self.renderer)
+        self.draw_primitive(surface, theme)
         self.draw_default_border(surface, theme)
 
     def layout(self, rect: pg.Rect) -> None:

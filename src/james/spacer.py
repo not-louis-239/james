@@ -15,8 +15,8 @@
 
 from pygame import Rect, Surface
 
-from james._internals.base_elem import Element
-from james._internals.custom_types import SupportsGetItemColour
+from james.base_elem import Element
+from james.custom_types import SupportsGetItemColour
 
 
 class Spacer(Element):

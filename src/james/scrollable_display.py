@@ -17,9 +17,9 @@ from typing import Any
 
 import pygame as pg
 
-from james._internals.base_elem import Element
+from james.base_elem import Element
 from james._internals.constants import DUMMY_SURFACE
-from james._internals.custom_types import Colour, DrawFunc, SupportsGetItemColour
+from james.custom_types import Colour, DrawFunc, SupportsGetItemColour
 from james.scroll_physics import ScrollPhysics
 
 
@@ -32,7 +32,7 @@ class ScrollableDisplay(Element):
             colours: dict[str, Colour] | None = None,
             padding: int = 0,
             child: Element,
-            renderer: DrawFunc,
+            renderer: DrawFunc | None = None,
             k_bg: str | None = None,
             k_border: str | None = None,
             border_w: int = 0
@@ -49,7 +49,7 @@ class ScrollableDisplay(Element):
         self.internal_rect = pg.Rect(0, 0, 0, 0)
         self.physics = ScrollPhysics(disp_topleft=(0, 0), disp_botright=(0, 0))
 
-        self.renderer = renderer
+        self._set_renderer(renderer)
         self.k_bg = k_bg
         self.k_border = k_border
         self.border_w = border_w

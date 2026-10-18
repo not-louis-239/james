@@ -17,8 +17,9 @@ from typing import Any
 
 import pygame as pg
 
-from james._internals.base_elem import Element
-from james._internals.custom_types import DrawFunc, SupportsGetItemColour
+from james.custom_types import Colour
+from james.base_elem import Element
+from james.custom_types import DrawFunc, SupportsGetItemColour
 from james.alignment_boxes import HBox
 
 
@@ -28,14 +29,14 @@ class Table(Element):
             cell_inset: int = 0,
             row_flexes: list[float] | None = None,
             column_flexes: list[float] | None = None,
-            cell_renderer: DrawFunc,
+            cell_renderer: DrawFunc | None = None,
             draw_attrs: dict[str, Any] | None = None,
-            colours: dict[str, tuple[int, int, int]] | None = None
+            colours: dict[str, Colour] | None = None
         ) -> None:
         super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours)
 
         self.cell_inset = cell_inset
-        self.cell_renderer = cell_renderer
+        self._set_renderer(cell_renderer)
 
         self.row_flexes = row_flexes or []
         self.column_flexes = column_flexes or []
@@ -137,4 +138,4 @@ class Table(Element):
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         for row in self.children:
             for elem in row.children:
-                self.cell_renderer(surface, elem, theme)
+                self.renderer(surface, elem, theme)

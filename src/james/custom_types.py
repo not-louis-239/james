@@ -19,13 +19,13 @@ from typing import TYPE_CHECKING, Any, Protocol
 from pygame import Surface
 
 if TYPE_CHECKING:
-    from james._internals.base_elem import Element
+    from james.base_elem import Element
 
 
 # TODO: add support for `type AColour = tuple[int, int, int, int]`
 
 
-type Colour = tuple[int, int, int]
+type Colour = tuple[int, int, int] | tuple[int, int, int, int]
 type DrawFunc = Callable[[Surface, Element, SupportsGetItemColour], None]
 type IntCoord2 = tuple[int, int]  # e.g. (width, height)
 

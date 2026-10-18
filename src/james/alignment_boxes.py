@@ -17,8 +17,8 @@ from enum import StrEnum
 
 import pygame as pg
 
-from james._internals.base_elem import Element
-from james._internals.custom_types import DrawFunc, SupportsGetItemColour
+from james.base_elem import Element
+from james.custom_types import DrawFunc, SupportsGetItemColour
 
 
 class HAlign(StrEnum):
@@ -35,14 +35,18 @@ class VAlign(StrEnum):
 class _Box(Element):
     """Generic base class to store attributes common to both `HBox`es and `VBox`es"""
 
-    def __init__(self, *children: Element, flex: float = 0.0, padding: int = 0, gap: int = 0, renderer: DrawFunc) -> None:
+    def __init__(
+            self, *children: Element,
+            flex: float = 0.0, padding: int = 0, gap: int = 0,
+            renderer: DrawFunc | None = None
+        ) -> None:
         """Initialises a new box.
         padding = space between the box's edge and the first or last child
         gap     = space between children in the box"""
         super().__init__(flex=flex)
         self.padding = padding
         self.gap = gap
-        self.renderer = renderer
+        self._set_renderer(renderer)
 
         if children is not None:
             for child in children:
@@ -192,7 +196,7 @@ class SBox(_Box):
     def __init__(
             self, child: Element, *,
             forced_width: int | None = None, forced_height: int | None = None,
-            renderer: DrawFunc,
+            renderer: DrawFunc | None = None,
             h_align: HAlign = HAlign.CENTRE,
             v_align: VAlign = VAlign.CENTRE,
             strict: bool = False
@@ -206,6 +210,7 @@ class SBox(_Box):
         self.h_align = h_align
         self.v_align = v_align
         self.strict = strict
+        self._set_renderer(renderer)
 
     def preferred_size(self) -> tuple[int, int]:
         # Ask the child what it wants, but override it if we have a forced constraint

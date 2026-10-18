@@ -17,8 +17,8 @@ from typing import Any
 
 import pygame as pg
 
-from james._internals.base_elem import Element
-from james._internals.custom_types import Colour, SupportsGetItemColour
+from james.base_elem import Element
+from james.custom_types import Colour, SupportsGetItemColour
 from james.utils import get_text_surf, wrap_text
 
 

@@ -21,6 +21,8 @@ UI library for pygame, designed to be modular and easy to use.
 
 
 from . import (
+    base_elem,
+    renderer,
     utils,
     alignment_boxes,
     button,
@@ -31,8 +33,10 @@ from . import (
     spacer,
     table,
 )
-from ._internals import base_elem, custom_types
+from . import custom_types
 
+
+set_default_renderer = renderer.set_default_renderer
 
 AmbientMessage = utils.AmbientMessage
 
