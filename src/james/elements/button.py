@@ -32,6 +32,7 @@ class _Button(Element):
             colours: dict[str, Colour] | None = None,
             text: str = "", font: pg.font.Font, inset: int = 0,
             fixed_size: tuple[int, int] | None = None, img_path: Path | None = None,
+            img_inset: int = 0,
             k_bg_colour: str | None = None,
             k_bg_hovered: str | None = None,
             k_bg_active: str | None = None,
@@ -49,6 +50,7 @@ class _Button(Element):
         self.inset = inset
         self.fixed_size = fixed_size
         self.img_path = img_path
+        self.img_inset = img_inset
 
         self.k_bg_colour = k_bg_colour
         self.k_bg_hovered = k_bg_hovered if k_bg_hovered is not None else k_bg_colour
@@ -136,7 +138,9 @@ class RectButton(_Button):
 
         # Draw icon
         if self.img_path is not None:
-            img_dims = resize_to_fit((img_cache.get_base_cache(self.img_path).get_size()), (self.rect.w, self.rect.h))
+            img_w = max(0, self.rect.width - 2 * self.img_inset)
+            img_h = max(0, self.rect.height - 2 * self.img_inset)
+            img_dims = resize_to_fit((img_cache.get_base_cache(self.img_path).get_size()), (img_w, img_h))
             img_surf = img_cache.get_tinted_scaled_img(self.img_path, theme[self.k_fg], (int(img_dims[0]), int(img_dims[1])))
             surface.blit(img_surf, img_surf.get_rect(center=self.rect.center))
 
@@ -164,6 +168,7 @@ class CircleButton(_Button):
             colours: dict[str, Colour] | None = None,
             text: str = "", font: pg.font.Font, inset: int = 0,
             fixed_size: tuple[int, int] | None = None, img_path: Path | None = None,
+            img_inset: int = 0,
             k_bg_colour: str | None = None,
             k_bg_hovered: str | None = None,
             k_bg_active: str | None = None,
@@ -178,6 +183,7 @@ class CircleButton(_Button):
         super().__init__(
             flex=flex, draw_attrs=draw_attrs, colours=colours,
             text=text, font=font, inset=inset, fixed_size=fixed_size, img_path=img_path,
+            img_inset=img_inset,
             k_bg_colour=k_bg_colour, k_bg_hovered=k_bg_hovered, k_bg_active=k_bg_active,
             k_fg_colour=k_fg_colour, k_fg_hovered=k_fg_hovered, k_fg_active=k_fg_active,
             k_border_colour=k_border_colour, k_border_hovered=k_border_hovered,
@@ -201,8 +207,10 @@ class CircleButton(_Button):
 
         # Draw icon, but bound to the button circle
         if self.img_path is not None:
+            img_w = max(0, self.rect.width - 2 * self.img_inset)
+            img_h = max(0, self.rect.height - 2 * self.img_inset)
             img_surf = img_cache.get_tinted_scaled_img(
-                self.img_path, theme[self.k_fg], self.preferred_size(),
+                self.img_path, theme[self.k_fg], (img_w, img_h),
                 constrain_proportions=True
             )
             surface.blit(img_surf, img_surf.get_rect(center=self.rect.center))
