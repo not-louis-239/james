@@ -18,7 +18,7 @@ from enum import StrEnum
 import pygame as pg
 
 from james.helpers.base_elem import Element
-from james.helpers.custom_types import DrawFunc, SupportsGetItemColour
+from james.helpers.custom_types import DrawFunc, SupportsGetItemColour, Colour
 
 
 class HAlign(StrEnum):
@@ -38,7 +38,8 @@ class _Box(Element):
     def __init__(
             self, *children: Element,
             flex: float = 0.0, padding: int = 0, gap: int = 0,
-            renderer: DrawFunc | None = None
+            renderer: DrawFunc | None = None,
+            k_bg_colour: str | None = None,
         ) -> None:
         """Initialises a new box.
         padding = space between the box's edge and the first or last child
@@ -46,6 +47,7 @@ class _Box(Element):
         super().__init__(flex=flex)
         self.padding = padding
         self.gap = gap
+        self.k_bg_colour = k_bg_colour
         self._set_renderer(renderer)
 
         if children is not None:
@@ -60,6 +62,8 @@ class _Box(Element):
         if not self.visible:
             return
 
+        if self.k_bg_colour is not None:
+            pg.draw.rect(surface, theme[self.k_bg_colour], self.rect)
         for child in self.children:
             self.renderer(surface, child, theme)
 
