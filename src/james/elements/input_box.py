@@ -17,9 +17,9 @@ from typing import Any
 
 import pygame as pg
 
-from james.base_elem import Element
-from james.custom_types import Colour, SupportsGetItemColour
-from james.utils import get_text_surf, wrap_text
+from james.helpers.base_elem import Element
+from james.helpers.custom_types import Colour, SupportsGetItemColour
+from james.helpers.utils import get_text_surf, wrap_text
 
 
 class InputBox(Element):
@@ -259,6 +259,9 @@ class InputBox(Element):
             pg.draw.rect(surface, theme[self.k_border], rect, self.border_w)
 
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        if not self.visible:
+            return
+
         # Primitive
         self.draw_primitive(surface, theme)
         self.draw_cursor(surface, theme)

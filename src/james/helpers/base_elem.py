@@ -20,7 +20,7 @@ from typing import Any
 
 import pygame as pg
 
-from . import renderer as _renderer
+from ..helpers import renderer as _renderer
 from .custom_types import Colour, SupportsGetItemColour, DrawFunc
 
 

@@ -19,10 +19,10 @@ from typing import Any
 
 import pygame as pg
 
-from james.base_elem import Element
-from james.custom_types import Colour, IntCoord2, SupportsGetItemColour
+from james.helpers.base_elem import Element
+from james.helpers.custom_types import Colour, IntCoord2, SupportsGetItemColour
 from james._internals.img_cache import img_cache
-from james.utils import get_text_surf, resize_to_fit
+from james.helpers.utils import get_text_surf, resize_to_fit
 
 
 class _Button(Element):
@@ -150,6 +150,9 @@ class RectButton(_Button):
             pg.draw.rect(surface, theme[self.k_border], self.rect, self.border_w)
 
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        if not self.visible:
+            return
+
         self.draw_primitive(surface, theme)
         self.draw_default_border(surface, theme)
 
@@ -215,6 +218,9 @@ class CircleButton(_Button):
             pg.draw.circle(surface, theme[self.k_border], self.rect.center, self.r, width=self.border_w)
 
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        if not self.visible:
+            return
+
         self.draw_primitive(surface, theme)
         self.draw_default_border(surface, theme)
 

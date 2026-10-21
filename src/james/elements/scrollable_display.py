@@ -17,10 +17,10 @@ from typing import Any
 
 import pygame as pg
 
-from james.base_elem import Element
+from james.helpers.base_elem import Element
 from james._internals.constants import DUMMY_SURFACE
-from james.custom_types import Colour, DrawFunc, SupportsGetItemColour
-from james.scroll_physics import ScrollPhysics
+from james.helpers.custom_types import Colour, DrawFunc, SupportsGetItemColour
+from james.helpers.scroll_physics import ScrollPhysics
 
 
 class ScrollableDisplay(Element):
@@ -102,10 +102,6 @@ class ScrollableDisplay(Element):
         if self.border_w and self.k_border is not None:
             pg.draw.rect(surface, theme[self.k_border], self.rect, width=self.border_w)
 
-    def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
-        self.draw_primitive(surface, theme)
-        self.draw_default_border(surface, theme)
-
     def preferred_size(self) -> tuple[int, int]:
         cw, ch = self.child.preferred_size()
         return cw + 2 * self.padding, ch + 2 * self.padding
@@ -115,3 +111,10 @@ class ScrollableDisplay(Element):
         # Then calculate the size of `self`'s internal rect and layout children according to it.
         self.rect = rect
         self.child.layout(pg.Rect(0, 0, *self.child.preferred_size()))
+
+    def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        if not self.visible:
+            return
+
+        self.draw_primitive(surface, theme)
+        self.draw_default_border(surface, theme)

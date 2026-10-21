@@ -17,62 +17,60 @@ from typing import Any
 
 import pygame as pg
 
-from james.base_elem import Element
-from james.custom_types import Colour, DrawFunc, SupportsGetItemColour
+from james.helpers.base_elem import Element
+from james.helpers.custom_types import Colour, SupportsGetItemColour
+from james.helpers.utils import crop_text_to_fit, get_text_surf
 
 
-class Panel(Element):
-    """A simple panel that can contain one child with padding."""
+class Label(Element):
     def __init__(
             self, *, flex: float = 0,
             draw_attrs: dict[str, Any] | None = None,
             colours: dict[str, Colour] | None = None,
-            horiz_padding: int = 0, vert_padding: int = 0,
-            child: Element | None = None,
-            k_bg: str | None = None,
-            k_border: str | None = None,
-            border_w: int = 0,
-            renderer: DrawFunc | None = None
+            text: str = "", font: pg.font.Font, inset: int = 0,
+            k_fg: str, k_bg: str | None = None, k_border: str | None = None,
+            border_w: int = 0
         ) -> None:
         super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours)
-        self.horiz_padding = horiz_padding
-        self.vert_padding = vert_padding
+        self.text = text
+        self.font = font
+        self.inset = inset
 
-        self.child = child
-        if child is not None:
-            child.parent = self
-
-        self.children = [child] if child is not None else []
-        self._set_renderer(renderer)
-
+        self.k_fg = k_fg
         self.k_bg = k_bg
         self.k_border = k_border
         self.border_w = border_w
 
+    def set_text(self, text: str) -> None:
+        self.text = text
+
     def preferred_size(self) -> tuple[int, int]:
-        if not self.child:
-            return (self.horiz_padding * 2, self.vert_padding * 2)
-        cw, ch = self.child.preferred_size()
-        return (cw + 2 * self.horiz_padding, ch + 2 * self.vert_padding)
+        text_w, text_h = self.font.size(self.text)
+        return (text_w + 2 * self.inset, text_h + 2 * self.inset)
 
     def draw_primitive(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
-        """Draws a primitive panel background, followed by the Panel's child."""
+        """Draws a label to a surface. If a `self.k_bg` is set and not None,
+        draws a solid background."""
+
+        # Background
         if self.k_bg is not None:
             pg.draw.rect(surface, theme[self.k_bg], self.rect)
 
-        if self.child:
-            self.renderer(surface, self.child, theme)
+        # Text
+        text = crop_text_to_fit(self.text, self.font, self.rect.width - 2 * self.inset)
+        text_surf = get_text_surf(self.font, text, theme[self.k_fg])
+        surface.blit(text_surf, self.rect.inflate(-2 * self.inset, -2 * self.inset))
 
     def draw_default_border(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         if self.border_w and self.k_border is not None:
-            pg.draw.rect(surface, theme[self.k_border], self.rect, self.border_w)
-
-    def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
-        self.draw_primitive(surface, theme)
-        self.draw_default_border(surface, theme)
+            pg.draw.rect(surface, theme[self.k_border], self.rect, width=self.border_w)
 
     def layout(self, rect: pg.Rect) -> None:
         self.rect = rect
-        if self.child:
-            child_rect = rect.inflate(-2 * self.horiz_padding, -2 * self.vert_padding)
-            self.child.layout(child_rect)
+
+    def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        if not self.visible:
+            return
+
+        self.draw_primitive(surface, theme)
+        self.draw_default_border(surface, theme)

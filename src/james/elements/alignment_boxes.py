@@ -17,8 +17,8 @@ from enum import StrEnum
 
 import pygame as pg
 
-from james.base_elem import Element
-from james.custom_types import DrawFunc, SupportsGetItemColour
+from james.helpers.base_elem import Element
+from james.helpers.custom_types import DrawFunc, SupportsGetItemColour
 
 
 class HAlign(StrEnum):
@@ -57,6 +57,9 @@ class _Box(Element):
         child.parent = self
 
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        if not self.visible:
+            return
+
         for child in self.children:
             self.renderer(surface, child, theme)
 

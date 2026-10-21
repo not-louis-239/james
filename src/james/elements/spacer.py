@@ -15,8 +15,8 @@
 
 from pygame import Rect, Surface
 
-from james.base_elem import Element
-from james.custom_types import SupportsGetItemColour
+from james.helpers.base_elem import Element
+from james.helpers.custom_types import SupportsGetItemColour
 
 
 class Spacer(Element):
@@ -33,3 +33,4 @@ class Spacer(Element):
 
     def draw_default(self, surface: Surface, theme: SupportsGetItemColour) -> None:
         """Draws nothing, as a Spacer is invisible."""
+        pass

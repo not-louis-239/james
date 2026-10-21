@@ -19,7 +19,7 @@ from typing import TYPE_CHECKING, Any, Protocol
 from pygame import Surface
 
 if TYPE_CHECKING:
-    from james.base_elem import Element
+    from james.helpers.base_elem import Element
 
 
 # TODO: add support for `type AColour = tuple[int, int, int, int]`

@@ -17,10 +17,10 @@ from typing import Any
 
 import pygame as pg
 
-from james.custom_types import Colour
-from james.base_elem import Element
-from james.custom_types import DrawFunc, SupportsGetItemColour
-from james.alignment_boxes import HBox
+from james.helpers.custom_types import Colour
+from james.helpers.base_elem import Element
+from james.helpers.custom_types import DrawFunc, SupportsGetItemColour
+from james.elements.alignment_boxes import HBox
 
 
 class Table(Element):
@@ -136,6 +136,9 @@ class Table(Element):
             cell_top += row_heights[rn]
 
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        if not self.visible:
+            return
+
         for row in self.children:
             for elem in row.children:
                 self.renderer(surface, elem, theme)

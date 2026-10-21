@@ -20,20 +20,9 @@ UI library for pygame, designed to be modular and easy to use.
 """
 
 
-from . import (
-    base_elem,
-    renderer,
-    utils,
-    alignment_boxes,
-    button,
-    input_box,
-    label,
-    panel,
-    scrollable_display,
-    spacer,
-    table,
-)
-from . import custom_types
+from .helpers import custom_types, renderer, utils
+from .elements import alignment_boxes, button, input_box, label, panel, scrollable_display, spacer, table
+from .helpers import base_elem
 
 
 set_default_renderer = renderer.set_default_renderer

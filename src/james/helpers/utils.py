@@ -18,9 +18,9 @@ from functools import lru_cache
 
 import pygame as pg
 
-from james.base_elem import Element
+from james.helpers.base_elem import Element
 from james._internals.constants import DUMMY_BLACK
-from james.custom_types import Colour, IntCoord2
+from james.helpers.custom_types import Colour, IntCoord2
 
 
 @dataclass(kw_only=True)
