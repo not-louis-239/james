@@ -32,28 +32,32 @@ class VAlign(StrEnum):
     BOTTOM = "bottom"
 
 
-# TODO: implement `shrink` attribute interpretation
-# boxes choose elements to shrink to fit the box based on their `shrink` property
-
-
 class _Box(Element):
     """Generic base class to store attributes common to both `HBox`es and `VBox`es"""
 
     def __init__(
-            self, *children: Element,
-            flex: float = 0.0, padding: int = 0, gap: int = 0,
+            self, *children: Element, flex: float = 0, shrink: float | None = None,
+            padding: int = 0, gap: int = 0,
             renderer: DrawFunc | None = None,
             k_bg_colour: str | None = None,
         ) -> None:
         """Initialises a new box.
         padding = space between the box's edge and the first or last child
-        gap     = space between children in the box"""
-        super().__init__(flex=flex)
+        gap     = space between children in the box
+
+        Flex must be provided explicitly for a box to propagate extra space downwards.
+        Shrink is propagated implicitly unless an override is specified."""
+
+        super().__init__(
+            flex=flex,
+            shrink=shrink if shrink is not None else sum(c.shrink for c in children)
+        )
 
         self.padding = padding
         self.gap = gap
         self.k_bg_colour = k_bg_colour
-        self.shrink = sum(c.shrink for c in children)
+        self._fixed_shrink = shrink
+
         self._set_renderer(renderer)
 
         if children is not None:
@@ -63,6 +67,9 @@ class _Box(Element):
     def add_child(self, child: Element) -> None:
         self.children.append(child)
         child.parent = self
+
+        if self._fixed_shrink is None:
+            self.shrink = self.shrink + child.shrink
 
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         if not self.visible:
@@ -108,8 +115,6 @@ class HBox(_Box):
         flex_children = [c for c in self.children if c.flex > 0]
         shrink_children = [c for c in self.children if c.shrink > 0]
 
-        print(f"[{id(self)}] Number of shrink children before layout: {len(shrink_children)}")
-
         total_gaps = self.gap * max(0, len(self.children) - 1)
         remaining = (
             rect.width
@@ -117,7 +122,6 @@ class HBox(_Box):
             - sum(preferred_widths.values())
             - total_gaps
         )
-        print(f"Remaining space: {remaining}")
 
         # No need to `.copy()` because `preferred_widths` is not used from here onwards
         widths: dict[Element, float] = preferred_widths
@@ -134,17 +138,9 @@ class HBox(_Box):
             # Distribute shortage according to `shrink`
             total_shrink = sum(c.shrink for c in shrink_children)
 
-            print(
-                f"[{id(self)}] SHORTAGE: "
-                f"remaining={remaining}, "
-                f"total_shrink={total_shrink}"
-            )
-
-            print(f"[{id(self)}] Number of shrink children during space assignment: {len(shrink_children)}")
             for c in shrink_children:
                 shrink_amount = -remaining * (c.shrink / total_shrink)
                 widths[c] = max(0, widths[c] - shrink_amount)
-                print(f"[{id(self)}] Subtracted {shrink_amount} from {c}")
 
         # Arrange children
         h = rect.height - 2 * self.padding
