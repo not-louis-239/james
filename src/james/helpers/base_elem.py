@@ -36,7 +36,6 @@ class Element(ABC):
         self.children: list[Element] = []
         self.parent: Element | None = None
 
-        # TODO: implement visibility affecting drawing
         self.visible: bool = True  # should I be seen?
         self.active: bool = True  # do I accept user input?
         self.disabled: bool = False  # am I supposed to block user input?

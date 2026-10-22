@@ -32,20 +32,6 @@ class _EditState:
     cursor_pos: int
     selection_anchor: int | None
 
-# TODO: add undo coalescence
-# could organise edits into something like:
-
-# @dataclass
-# class _Edit:
-#     before: _EditState
-#     after: _EditState
-#     kind: _EditKind
-
-# class _EditKind(Enum):
-#     INSERT = "insert"
-#     DELETE = "delete"
-#     REPLACE = "replace"
-
 
 class InputBox(Element):
     CURSOR_FLASH_INTERVAL = 0.75
@@ -74,7 +60,8 @@ class InputBox(Element):
             k_border_active: str | None = None,
             k_cursor: str,
             k_bg_selection: str | None = None,
-            k_sentinel: str | None = None
+            k_sentinel: str | None = None,
+            text_size_limit: int = 255
         ) -> None:
         super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours)
 
@@ -113,6 +100,7 @@ class InputBox(Element):
         self.scroll_offset = 0
         self.mouse_selecting = False
         self.selection_anchor: int | None = None
+        self.text_size_limit = text_size_limit
         self._undo_stack: list[_EditState] = []
         self._redo_stack: list[_EditState] = []
 
@@ -194,6 +182,32 @@ class InputBox(Element):
 
         return True
 
+    def _previous_word_pos(self) -> int:
+        pos = self.cursor_pos
+
+        # Skip whitespace to the right of the word
+        while pos > 0 and not self.text[pos - 1].isalnum():
+            pos -= 1
+
+        # Skip the word itself
+        while pos > 0 and self.text[pos - 1].isalnum():
+            pos -= 1
+
+        return pos
+
+    def _next_word_pos(self) -> int:
+        pos = self.cursor_pos
+
+        # Skip whitespace to the left of the word
+        while pos < len(self.text) and not self.text[pos].isalnum():
+            pos += 1
+
+        # Skip the word itself
+        while pos < len(self.text) and self.text[pos].isalnum():
+            pos += 1
+
+        return pos
+
     def get_selection_range(self) -> tuple[int, int] | None:
         if self.selection_anchor is None or self.selection_anchor == self.cursor_pos:
             return None
@@ -234,8 +248,11 @@ class InputBox(Element):
             + text
             + self.text[self.cursor_pos:]
         )
-
         self.cursor_pos += len(text)
+
+        self.text = self.text[:self.text_size_limit]
+        self.cursor_pos = min(self.cursor_pos, self.text_size_limit)
+
         self.cursor_flash_time = 0
 
     def select_all(self) -> None:
@@ -392,20 +409,35 @@ class InputBox(Element):
                 # Delete
                 elif event.key == pg.K_BACKSPACE:
                     if not self.delete_selection() and self.cursor_pos > 0:
+                        self._save_undo_state()
+
+                        if mods & _COMMAND_KEY:
+                            dest_pos = 0
+                        elif mods & pg.KMOD_ALT:
+                            dest_pos = self._previous_word_pos()
+                        else:
+                            dest_pos = self.cursor_pos - 1
+
                         self.text = (
-                            self.text[:self.cursor_pos - 1]
+                            self.text[:dest_pos]
                             + self.text[self.cursor_pos:]
                         )
-                        self.cursor_pos -= 1
+                        self.cursor_pos = dest_pos
 
                     self.cursor_flash_time = 0
 
                 # Forward delete
                 elif event.key == pg.K_DELETE:
                     if not self.delete_selection() and self.cursor_pos < len(self.text):
+                        if mods & pg.KMOD_ALT:
+                            dest_pos = self._next_word_pos()
+                        else:
+                            dest_pos = self.cursor_pos + 1
+
+                        self._save_undo_state()
                         self.text = (
                             self.text[:self.cursor_pos]
-                            + self.text[self.cursor_pos + 1:]
+                            + self.text[dest_pos:]
                         )
 
                     self.cursor_flash_time = 0
@@ -414,6 +446,8 @@ class InputBox(Element):
                 elif event.key == pg.K_LEFT:
                     if mods & _COMMAND_KEY:
                         dest_pos = 0
+                    elif mods & pg.KMOD_ALT:
+                        dest_pos = self._previous_word_pos()
                     elif self.selection_anchor is not None and not (mods & pg.KMOD_SHIFT):
                         dest_pos = min(self.cursor_pos, self.selection_anchor)
                     else:
@@ -429,6 +463,8 @@ class InputBox(Element):
                 elif event.key == pg.K_RIGHT:
                     if mods & _COMMAND_KEY:
                         dest_pos = len(self.text)
+                    elif mods & pg.KMOD_ALT:
+                        dest_pos = self._next_word_pos()
                     elif self.selection_anchor is not None and not (mods & pg.KMOD_SHIFT):
                         dest_pos = max(self.cursor_pos, self.selection_anchor)
                     else:

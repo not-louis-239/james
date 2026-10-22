@@ -22,9 +22,6 @@ if TYPE_CHECKING:
     from james.helpers.base_elem import Element
 
 
-# TODO: add support for `type AColour = tuple[int, int, int, int]`
-
-
 type Colour = tuple[int, int, int] | tuple[int, int, int, int]
 type DrawFunc = Callable[[Surface, Element, SupportsGetItemColour], None]
 type IntCoord2 = tuple[int, int]  # e.g. (width, height)
