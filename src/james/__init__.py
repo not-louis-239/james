@@ -20,8 +20,10 @@ UI library for pygame, designed to be modular and easy to use.
 """
 
 
+from .elements.containers import alignment_boxes, panel, scrollable_display, table
+from .elements.leaves import button, input_box, label, spacer
 from .helpers import custom_types, renderer, utils
-from .elements import alignment_boxes, button, input_box, label, panel, scrollable_display, spacer, table
+from .elements import collapsibles
 from .helpers import base_elem
 
 
@@ -37,6 +39,7 @@ Element = base_elem.Element
 HAlign = alignment_boxes.HAlign
 VAlign = alignment_boxes.VAlign
 
+Collapsible = collapsibles.Collapsible
 HBox = alignment_boxes.HBox
 VBox = alignment_boxes.VBox
 SBox = alignment_boxes.SBox

@@ -20,7 +20,7 @@ import pygame as pg
 from james.helpers.custom_types import Colour
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import DrawFunc, SupportsGetItemColour
-from james.elements.alignment_boxes import HBox
+from james.elements.containers.alignment_boxes import HBox
 
 
 class Table(Element):
