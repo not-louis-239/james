@@ -25,7 +25,7 @@ from james.elements.alignment_boxes import HBox
 
 class Table(Element):
     def __init__(
-            self, *rows: HBox, flex: float = 0,
+            self, *rows: HBox, flex: float = 0, shrink: float = 0.0,
             cell_inset: int = 0,
             row_flexes: list[float] | None = None,
             column_flexes: list[float] | None = None,
@@ -33,7 +33,7 @@ class Table(Element):
             draw_attrs: dict[str, Any] | None = None,
             colours: dict[str, Colour] | None = None
         ) -> None:
-        super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours)
+        super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours)
 
         self.cell_inset = cell_inset
         self._set_renderer(cell_renderer)

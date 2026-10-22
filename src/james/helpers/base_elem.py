@@ -26,11 +26,16 @@ from .custom_types import Colour, SupportsGetItemColour, DrawFunc
 
 class Element(ABC):
     def __init__(
-            self, *, flex: float = 0.0,
+            self, *, flex: float = 0.0, shrink: float = 0.0,
             draw_attrs: dict[str, Any] | None = None,
             colours: dict[str, Colour] | None = None,
         ) -> None:
-        self.flex = flex
+        # The ratios of flex or shrink for different UI components
+        # determines how the excess or shortage of space is distributed
+        # by arrangement boxes such as `HBox`es, `VBox`es, etc.
+
+        self.flex = flex  # expand if there is excess space
+        self.shrink = shrink  # shrink if there is insufficient space
         self.rect = pg.Rect(0, 0, 0, 0)
 
         self.children: list[Element] = []

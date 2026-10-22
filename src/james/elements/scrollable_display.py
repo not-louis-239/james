@@ -27,7 +27,7 @@ class ScrollableDisplay(Element):
     """Creates a display that is vertically scrollable.
     Its height depends on the preferred size of the contents inside of the display."""
     def __init__(
-            self, *, flex: float = 0,
+            self, *, flex: float = 0, shrink: float = 0.0,
             draw_attrs: dict[str, Any] | None = None,
             colours: dict[str, Colour] | None = None,
             padding: int = 0,
@@ -37,7 +37,7 @@ class ScrollableDisplay(Element):
             k_border: str | None = None,
             border_w: int = 0
         ) -> None:
-        super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours)
+        super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours)
         self.padding = padding
 
         self.child = child

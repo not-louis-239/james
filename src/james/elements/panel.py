@@ -24,7 +24,7 @@ from james.helpers.custom_types import Colour, DrawFunc, SupportsGetItemColour
 class Panel(Element):
     """A simple panel that can contain one child with padding."""
     def __init__(
-            self, *, flex: float = 0,
+            self, *, flex: float = 0, shrink: float = 0.0,
             draw_attrs: dict[str, Any] | None = None,
             colours: dict[str, Colour] | None = None,
             horiz_padding: int = 0, vert_padding: int = 0,
@@ -34,7 +34,7 @@ class Panel(Element):
             border_w: int = 0,
             renderer: DrawFunc | None = None
         ) -> None:
-        super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours)
+        super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours)
         self.horiz_padding = horiz_padding
         self.vert_padding = vert_padding
 

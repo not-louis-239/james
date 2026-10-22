@@ -32,6 +32,10 @@ class VAlign(StrEnum):
     BOTTOM = "bottom"
 
 
+# TODO: implement `shrink` attribute interpretation
+# boxes choose elements to shrink to fit the box based on their `shrink` property
+
+
 class _Box(Element):
     """Generic base class to store attributes common to both `HBox`es and `VBox`es"""
 
@@ -45,9 +49,11 @@ class _Box(Element):
         padding = space between the box's edge and the first or last child
         gap     = space between children in the box"""
         super().__init__(flex=flex)
+
         self.padding = padding
         self.gap = gap
         self.k_bg_colour = k_bg_colour
+        self.shrink = sum(c.shrink for c in children)
         self._set_renderer(renderer)
 
         if children is not None:
@@ -92,44 +98,63 @@ class HBox(_Box):
     def layout(self, rect: pg.Rect) -> None:
         self.rect = rect
 
-        # measure fixed sizes
-        total_fixed_width = 0
-        flex_children: list[Element] = []
+        # Measure preferred sizes
+        preferred_widths: dict[Element, float] = {
+            child: child.preferred_size()[0]
+            for child in self.children
+        }
 
-        for child in self.children:
-            flex = child.flex
-            if flex:
-                flex_children.append(child)
-                continue
-            w, _ = child.preferred_size()
-            total_fixed_width += w
+        # Get children who can flex and shrink, and total gap width
+        flex_children = [c for c in self.children if c.flex > 0]
+        shrink_children = [c for c in self.children if c.shrink > 0]
+
+        print(f"[{id(self)}] Number of shrink children before layout: {len(shrink_children)}")
 
         total_gaps = self.gap * max(0, len(self.children) - 1)
+        remaining = (
+            rect.width
+            - 2 * self.padding
+            - sum(preferred_widths.values())
+            - total_gaps
+        )
+        print(f"Remaining space: {remaining}")
 
-        remaining = max(0, rect.width - 2 * self.padding - total_fixed_width - total_gaps)
+        # No need to `.copy()` because `preferred_widths` is not used from here onwards
+        widths: dict[Element, float] = preferred_widths
 
-        # assign flex space
-        total_flex = sum(c.flex for c in flex_children)
-        flex_widths = {}
+        if remaining > 0:
+            # Distribute excess space according to `flex`
+            total_flex = sum(c.flex for c in flex_children)
 
-        if total_flex > 0:
             for c in flex_children:
-                flex_widths[c] = remaining * (c.flex / total_flex)
+                flex_amount = remaining * (c.flex / total_flex)
+                widths[c] += flex_amount
 
-        # place children
+        elif remaining < 0:
+            # Distribute shortage according to `shrink`
+            total_shrink = sum(c.shrink for c in shrink_children)
+
+            print(
+                f"[{id(self)}] SHORTAGE: "
+                f"remaining={remaining}, "
+                f"total_shrink={total_shrink}"
+            )
+
+            print(f"[{id(self)}] Number of shrink children during space assignment: {len(shrink_children)}")
+            for c in shrink_children:
+                shrink_amount = -remaining * (c.shrink / total_shrink)
+                widths[c] = max(0, widths[c] - shrink_amount)
+                print(f"[{id(self)}] Subtracted {shrink_amount} from {c}")
+
+        # Arrange children
         h = rect.height - 2 * self.padding
         x = rect.x + self.padding
         y = rect.y + self.padding
 
         for child in self.children:
-            w, _ = child.preferred_size()
-
-            if child in flex_widths:
-                w = int(flex_widths[child])
-
+            w = widths[child]
             child_rect = pg.Rect(x, y, w, h)
             child.layout(child_rect)
-
             x += w + self.gap
 
 class VBox(_Box):
@@ -157,42 +182,52 @@ class VBox(_Box):
     def layout(self, rect: pg.Rect) -> None:
         self.rect = rect
 
-        total_fixed_height = 0
-        flex_children = []
+        # Measure preferred sizes
+        preferred_heights: dict[Element, float] = {
+            child: child.preferred_size()[1]
+            for child in self.children
+        }
 
-        for child in self.children:
-            flex = child.flex
-            if flex:
-                flex_children.append(child)
-            else:
-                _, h = child.preferred_size()
-                total_fixed_height += h
+        # Get children who can flex and shrink, and total gap height
+        flex_children = [c for c in self.children if c.flex > 0]
+        shrink_children = [c for c in self.children if c.shrink > 0]
 
         total_gaps = self.gap * max(0, len(self.children) - 1)
-        remaining = max(0, rect.height - 2 * self.padding - total_fixed_height - total_gaps)
+        remaining = (
+            rect.height
+            - 2 * self.padding
+            - sum(preferred_heights.values())
+            - total_gaps
+        )
 
-        total_flex = sum(c.flex for c in flex_children)
-        flex_heights = {}
+        # No need to `.copy()` because `preferred_heights` is not used from here onwards
+        heights: dict[Element, float] = preferred_heights
 
-        # Assign flex space
-        if total_flex > 0:
+        if remaining > 0:
+            # Distribute excess space according to `flex`
+            total_flex = sum(c.flex for c in flex_children)
+
             for c in flex_children:
-                flex_heights[c] = remaining * (c.flex / total_flex)
+                flex_amount = remaining * (c.flex / total_flex)
+                heights[c] += flex_amount
 
-        # place children
+        elif remaining < 0:
+            # Distribute shortage according to `shrink`
+            total_shrink = sum(c.shrink for c in shrink_children)
+
+            for c in shrink_children:
+                shrink_amount = -remaining * (c.shrink / total_shrink)
+                heights[c] = max(0, heights[c] - shrink_amount)
+
+        # Arrange children
         w = rect.width - 2 * self.padding
         x = rect.x + self.padding
         y = rect.y + self.padding
 
         for child in self.children:
-            _, h = child.preferred_size()
-
-            if child in flex_heights:
-                h = int(flex_heights[child])
-
+            h = heights[child]
             child_rect = pg.Rect(x, y, w, h)
             child.layout(child_rect)
-
             y += h + self.gap
 
 class SBox(_Box):
