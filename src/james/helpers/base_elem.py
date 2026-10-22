@@ -88,6 +88,27 @@ class Element(ABC):
 
         return parents
 
+    def _set_visibility(self, val: bool) -> None:
+        """Set the visibility of the UI element and all of its children, if any."""
+        self.visible = val
+        for child in self.children:
+            child._set_visibility(val)
+
+    def hide(self) -> None:
+        """Hide the UI element and all of its children, if any."""
+        self._set_visibility(False)
+
+    def show(self) -> None:
+        """Show the UI element and all of its children, if any."""
+        self._set_visibility(True)
+
+    def toggle_visibility(self) -> None:
+        """Toggle the visibility of the UI element.
+        If it is currently invisible, call `show()`.
+        If it is currently visible, call `hide()`.
+        """
+        (self.show if self.visible else self.hide)()
+
     @abstractmethod
     def preferred_size(self) -> tuple[int, int]:
         """How big should this UI element be, given no constraints?"""

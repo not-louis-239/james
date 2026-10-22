@@ -15,6 +15,7 @@
 
 from dataclasses import dataclass
 from functools import lru_cache
+from typing import overload
 
 import pygame as pg
 
@@ -174,3 +175,12 @@ def dfs(root_elem: Element) -> list[Element]:
         stack.extend(reversed(current.children))
 
     return result
+
+
+@overload
+def clamp(val: int, low: int, high: int) -> int: ...
+@overload
+def clamp(val: float, low: float, high: float) -> float: ...
+def clamp(val: float, low: float, high: float) -> float:
+    """Clamp a value between `low` and `high`."""
+    return max(min(val, high), low)

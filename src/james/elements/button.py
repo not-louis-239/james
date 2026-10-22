@@ -119,7 +119,7 @@ class _Button(Element):
 
 class RectButton(_Button):
     def check_overlaps(self, pos: tuple[int, int]) -> bool:
-        if self.disabled:
+        if self.disabled or not self.visible:
             return False
         return self.rect.collidepoint(pos)
 
@@ -192,7 +192,7 @@ class CircleButton(_Button):
         self.r = r
 
     def check_overlaps(self, pos: tuple[int, int]) -> bool:
-        if self.disabled:
+        if self.disabled or not self.visible:
             return False
         dx = pos[0] - self.rect.centerx
         dy = pos[1] - self.rect.centery

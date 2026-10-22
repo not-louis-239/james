@@ -13,23 +13,43 @@
 # limitations under the License.
 
 
+import sys
+from dataclasses import dataclass
 from typing import Any
 
 import pygame as pg
 
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import Colour, SupportsGetItemColour
-from james.helpers.utils import get_text_surf, wrap_text
+from james.helpers.utils import get_text_surf, wrap_text, clamp
+
+
+_COMMAND_KEY = pg.KMOD_CTRL if sys.platform == "win32" else pg.KMOD_META
+
+@dataclass
+class _EditState:
+    text: str
+    cursor_pos: int
+    selection_anchor: int | None
+
+# TODO: add undo coalescence
+# could organise edits into something like:
+
+# @dataclass
+# class _Edit:
+#     before: _EditState
+#     after: _EditState
+#     kind: _EditKind
+
+# class _EditKind(Enum):
+#     INSERT = "insert"
+#     DELETE = "delete"
+#     REPLACE = "replace"
 
 
 class InputBox(Element):
-    DELETE_DELAY = 0.5
-    DELETE_INTERVAL = 0.075
-
     CURSOR_FLASH_INTERVAL = 0.75
     CURSOR_VISUAL_W = 2
-
-    TEXT_RENDER_LIMIT_CHARS = 255
 
     def __init__(
             self, *, flex: float = 0,
@@ -53,6 +73,7 @@ class InputBox(Element):
             k_border_hovered: str | None = None,
             k_border_active: str | None = None,
             k_cursor: str,
+            k_bg_selection: str | None = None,
             k_sentinel: str | None = None
         ) -> None:
         super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours)
@@ -84,16 +105,25 @@ class InputBox(Element):
         self.k_border_active = k_border_active if k_border_active is not None else k_border_colour
 
         self.k_cursor = k_cursor
+        self.k_bg_selection = k_bg_selection
         self.k_sentinel = k_sentinel if k_sentinel is not None else self.k_fg_colour
 
-        self.delete_timer = self.DELETE_DELAY
         self.cursor_flash_time = 0
+        self.cursor_pos = 0
+        self.scroll_offset = 0
+        self.mouse_selecting = False
+        self.selection_anchor: int | None = None
+        self._undo_stack: list[_EditState] = []
+        self._redo_stack: list[_EditState] = []
+
+    def check_hovered(self) -> bool:
+        return self.rect.collidepoint(pg.mouse.get_pos())
 
     @property
     def k_bg(self) -> str | None:
         return (
             self.k_bg_active if self.active
-            else self.k_bg_hovered if self.rect.collidepoint(pg.mouse.get_pos())
+            else self.k_bg_hovered if self.check_hovered()
             else self.k_bg_colour
         )
 
@@ -102,7 +132,7 @@ class InputBox(Element):
         return (
             self.k_sentinel if not self.text
             else self.k_fg_active if self.active
-            else self.k_fg_hovered if self.rect.collidepoint(pg.mouse.get_pos())
+            else self.k_fg_hovered if self.check_hovered()
             else self.k_fg_colour
         )
 
@@ -110,9 +140,177 @@ class InputBox(Element):
     def k_border(self) -> str | None:
         return (
             self.k_border_active if self.active
-            else self.k_border_hovered if self.rect.collidepoint(pg.mouse.get_pos())
+            else self.k_border_hovered if self.check_hovered()
             else self.k_border_colour
         )
+
+    def _get_cursor_pos_from_mouse(self, mouse_x: int) -> int:
+        x = (
+            mouse_x
+            - self.rect.x
+            - self.inset
+            + self.scroll_offset
+        )
+
+        for i in range(len(self.text)):
+            char_mid = self.font.size(self.text[:i])[0]
+            next_mid = self.font.size(self.text[:i + 1])[0]
+
+            if x < (char_mid + next_mid) / 2:
+                return i
+
+        return len(self.text)
+
+    def _save_undo_state(self) -> None:
+        """Add a new action to the undo stack. This will clear the redo stack."""
+        self._undo_stack.append(
+            _EditState(
+                self.text,
+                self.cursor_pos,
+                self.selection_anchor,
+            )
+        )
+        self._redo_stack.clear()
+
+    def _ensure_cursor_visible(self) -> None:
+        cursor_x = self.font.size(self.text[:self.cursor_pos])[0]
+        visible_w = self.rect.width - 2 * self.inset
+
+        if cursor_x - self.scroll_offset > visible_w:
+            self.scroll_offset = cursor_x - visible_w
+
+        elif cursor_x - self.scroll_offset < 0:
+            self.scroll_offset = cursor_x
+
+    def _delete_selection(self) -> bool:
+        if not (selection := self.get_selection_range()):
+            return False
+
+        start, end = selection
+        self.text = self.text[:start] + self.text[end:]
+        self.cursor_pos = start
+        self.selection_anchor = None
+        self.cursor_flash_time = 0
+
+        return True
+
+    def get_selection_range(self) -> tuple[int, int] | None:
+        if self.selection_anchor is None or self.selection_anchor == self.cursor_pos:
+            return None
+
+        return (
+            min(self.selection_anchor, self.cursor_pos),
+            max(self.selection_anchor, self.cursor_pos),
+        )
+
+    def get_selected_text(self) -> str | None:
+        selection = self.get_selection_range()
+        if selection is None:
+            return None
+        return self.text[selection[0]:selection[1]]
+
+    def delete_selection(self) -> bool:
+        """Delete the text currently selected, and return True if successful,
+        otherwise return False. """
+
+        if self.get_selection_range() is None:
+            return False
+
+        self._save_undo_state()
+        self._delete_selection()
+
+        self.cursor_flash_time = 0
+        return True
+
+    def insert_text(self, text: str) -> None:
+        if not text:
+            return
+
+        self._save_undo_state()
+        self._delete_selection()
+
+        self.text = (
+            self.text[:self.cursor_pos]
+            + text
+            + self.text[self.cursor_pos:]
+        )
+
+        self.cursor_pos += len(text)
+        self.cursor_flash_time = 0
+
+    def select_all(self) -> None:
+        self.selection_anchor = 0
+        self.cursor_pos = len(self.text)
+        self.cursor_flash_time = 0
+
+    def copy_text(self) -> None:
+        if text := self.get_selected_text():
+            pg.scrap.put_text(text)
+            self.cursor_flash_time = 0
+
+    def cut_text(self) -> None:
+        if text := self.get_selected_text():
+            pg.scrap.put_text(text)
+            self.delete_selection()
+            self.cursor_flash_time = 0
+
+    def paste_text(self) -> None:
+        if text := pg.scrap.get_text():
+            self.insert_text(text)
+            self.cursor_flash_time = 0
+
+    def undo(self) -> None:
+        if not self._undo_stack:
+            return
+
+        self._redo_stack.append(
+            _EditState(
+                self.text,
+                self.cursor_pos,
+                self.selection_anchor,
+            )
+        )
+
+        state = self._undo_stack.pop()
+
+        self.text = state.text
+        self.cursor_pos = state.cursor_pos
+        self.selection_anchor = state.selection_anchor
+
+        self.cursor_flash_time = 0
+        self._ensure_cursor_visible()
+
+    def redo(self) -> None:
+        if not self._redo_stack:
+            return
+
+        self._undo_stack.append(
+            _EditState(
+                self.text,
+                self.cursor_pos,
+                self.selection_anchor,
+            )
+        )
+
+        state = self._redo_stack.pop()
+
+        self.text = state.text
+        self.cursor_pos = state.cursor_pos
+        self.selection_anchor = state.selection_anchor
+
+        self.cursor_flash_time = 0
+        self._ensure_cursor_visible()
+
+    def move_cursor(self, position: int, *, selecting: bool = False) -> None:
+        position = clamp(position, 0, len(self.text))
+
+        if selecting:
+            if self.selection_anchor is None:
+                self.selection_anchor = self.cursor_pos
+        else:
+            self.selection_anchor = None
+
+        self.cursor_pos = position
 
     def set_tooltip(self, msg: str | None = None) -> None:
         self.tooltip_msg = msg
@@ -126,6 +324,7 @@ class InputBox(Element):
         if self.disabled:
             return False
 
+        mods = pg.key.get_mods()
         old_contents = self.text
 
         # Cursor flash time
@@ -137,29 +336,117 @@ class InputBox(Element):
         # Handle KEYDOWN events
         for event in events:
             if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-                self.active = self.rect.collidepoint(event.pos)
+                if self.rect.collidepoint(event.pos):
+                    self.active = True
+
+                    self.cursor_pos = self._get_cursor_pos_from_mouse(event.pos[0])
+                    self.selection_anchor = self.cursor_pos
+                    self.mouse_selecting = True
+
+                    self.cursor_flash_time = 0
+                else:
+                    self.active = False
+                    self.mouse_selecting = False
+                    self.selection_anchor = None
+
+            elif event.type == pg.MOUSEMOTION and self.mouse_selecting:
+                self.cursor_pos = self._get_cursor_pos_from_mouse(event.pos[0])
                 self.cursor_flash_time = 0
-            elif event.type == pg.KEYDOWN:
-                if self.active:
-                    if event.key == pg.K_BACKSPACE:
-                        self.text = self.text[:-1]
-                        self.cursor_flash_time = 0
-                    elif event.key not in (pg.K_RETURN, pg.K_ESCAPE, pg.K_TAB):
+
+            elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
+                self.mouse_selecting = False
+                if self.cursor_pos == self.selection_anchor:
+                    self.selection_anchor = None
+
+            elif event.type == pg.KEYDOWN and self.active:
+                # Select all
+                if (mods & _COMMAND_KEY) and event.key == pg.K_a:
+                    self.select_all()
+
+                # Copy text
+                elif (mods & _COMMAND_KEY) and event.key == pg.K_c:
+                    self.copy_text()
+
+                # Cut text
+                elif (mods & _COMMAND_KEY) and event.key == pg.K_x:
+                    self.cut_text()
+
+                # Paste text
+                elif (mods & _COMMAND_KEY) and event.key == pg.K_v:
+                    self.paste_text()
+
+                # Redo - must come before undo
+                elif (
+                    (mods & _COMMAND_KEY) and
+                    (
+                        (mods & pg.KMOD_SHIFT) and event.key == pg.K_z
+                        or event.key == pg.K_y
+                    )
+                ):
+                    self.redo()
+
+                # Undo
+                elif (mods & _COMMAND_KEY) and event.key == pg.K_z:
+                    self.undo()
+
+                # Delete
+                elif event.key == pg.K_BACKSPACE:
+                    if not self.delete_selection() and self.cursor_pos > 0:
+                        self.text = (
+                            self.text[:self.cursor_pos - 1]
+                            + self.text[self.cursor_pos:]
+                        )
+                        self.cursor_pos -= 1
+
+                    self.cursor_flash_time = 0
+
+                # Forward delete
+                elif event.key == pg.K_DELETE:
+                    if not self.delete_selection() and self.cursor_pos < len(self.text):
+                        self.text = (
+                            self.text[:self.cursor_pos]
+                            + self.text[self.cursor_pos + 1:]
+                        )
+
+                    self.cursor_flash_time = 0
+
+                # Move cursor left
+                elif event.key == pg.K_LEFT:
+                    if mods & _COMMAND_KEY:
+                        dest_pos = 0
+                    elif self.selection_anchor is not None and not (mods & pg.KMOD_SHIFT):
+                        dest_pos = min(self.cursor_pos, self.selection_anchor)
+                    else:
+                        dest_pos = self.cursor_pos - 1
+
+                    self.move_cursor(
+                        dest_pos,
+                        selecting=bool(mods & pg.KMOD_SHIFT),
+                    )
+                    self.cursor_flash_time = 0
+
+                # Move cursor right
+                elif event.key == pg.K_RIGHT:
+                    if mods & _COMMAND_KEY:
+                        dest_pos = len(self.text)
+                    elif self.selection_anchor is not None and not (mods & pg.KMOD_SHIFT):
+                        dest_pos = max(self.cursor_pos, self.selection_anchor)
+                    else:
+                        dest_pos = self.cursor_pos + 1
+
+                    self.move_cursor(
+                        dest_pos,
+                        selecting=bool(mods & pg.KMOD_SHIFT),
+                    )
+                    self.cursor_flash_time = 0
+
+                # Add characters
+                elif event.key not in (pg.K_RETURN, pg.K_ESCAPE, pg.K_TAB):
+                    if text := event.unicode:
                         # Append character
-                        self.text += event.unicode
-                        self.cursor_flash_time = 0
+                        self.insert_text(text)
 
-        # Handle delete
-        if keys[pg.K_BACKSPACE] and self.active:
-            self.delete_timer -= dt_s
-            if self.delete_timer <= 0:
-                self.text = self.text[:-1]
-                self.delete_timer += self.DELETE_INTERVAL
-                self.cursor_flash_time = 0
-        else:
-            # If delete is not held down, reset the delete timer
-            self.delete_timer = self.DELETE_DELAY
-
+        self._ensure_cursor_visible()
         return self.text != old_contents
 
     def draw_primitive(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
@@ -170,24 +457,27 @@ class InputBox(Element):
         if self.k_bg is not None:
             pg.draw.rect(surface, theme[self.k_bg], self.rect)
 
-        # Text - rendering only last 255 chars for performance
-        text = self.text[-255:] if self.text else self.sentinel_text
-        text_surf = get_text_surf(self.font, text, theme[self.k_fg])
-        text_visual_width = self.rect.width - 2 * self.inset
+        text_max_width = self.rect.width - 2 * self.inset
+        text_top = self.rect.y + (self.rect.h - self.font.get_height()) // 2
 
-        # Draw the text aligned to left-centre
-        dest = (
-            self.rect.x + self.inset,
-            self.rect.centery - text_surf.get_height() // 2,
-        )
+        text_left = self.rect.x + self.inset
 
+        # Draw selection highlight
+        if self.selection_anchor is not None:
+            left, right = min(self.selection_anchor, self.cursor_pos), max(self.selection_anchor, self.cursor_pos)
+            select_left = text_left + max(0, self.font.size(self.text[:left])[0] - self.scroll_offset)
+            select_right = text_left + min(text_max_width, self.font.size(self.text[:right])[0] - self.scroll_offset)
+            pg.draw.rect(surface, theme[self.k_bg_selection], (select_left, text_top, select_right - select_left, self.font.get_height()))
+
+        text_surf = self.font.render(self.text, True, theme[self.k_fg])
         source_rect = pg.Rect(
-            max(0, text_surf.get_width() - text_visual_width),
+            self.scroll_offset,
             0,
-            min(text_visual_width, text_surf.get_width()),
-            text_surf.get_height()
+            text_max_width,
+            self.font.get_height()
         )
 
+        dest = (self.rect.x + self.inset, text_top)
         surface.blit(text_surf, dest, source_rect)
 
     def draw_default_border(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
@@ -198,9 +488,10 @@ class InputBox(Element):
         # Draw the cursor
         if self.active and self.cursor_flash_time < self.CURSOR_FLASH_INTERVAL * 0.5:
             cursor_x = self.rect.x + self.inset + (
-                0 if not self.text else min(
+                0 if not self.text else clamp(
+                    self.font.size(self.text[:self.cursor_pos])[0] - self.scroll_offset,
+                    0,
                     self.rect.width - 2 * self.inset,
-                    self.font.size(self.text)[0]
                 )
             )
             cursor_top_y = self.rect.centery - self.font.get_height() // 2

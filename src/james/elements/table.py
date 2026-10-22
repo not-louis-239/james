@@ -136,9 +136,7 @@ class Table(Element):
             cell_top += row_heights[rn]
 
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
-        if not self.visible:
-            return
-
         for row in self.children:
             for elem in row.children:
-                self.renderer(surface, elem, theme)
+                if elem.visible:
+                    self.renderer(surface, elem, theme)
