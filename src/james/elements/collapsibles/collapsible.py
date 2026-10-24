@@ -13,8 +13,34 @@
 # limitations under the License.
 
 
-from ...helpers.base_elem import Element
+from typing import Any
+
+from pygame import Surface
+
+from james.helpers.base_elem import Element
+from james.helpers.custom_types import Colour, SupportsGetItemColour
 
 
 class Collapsible(Element):
-    pass
+    def __init__(
+            self, *,
+            flex: float = 0, shrink: float = 0,
+            trigger: Element, content: Element,
+            draw_attrs: dict[str, Any] | None = None,
+            colours: dict[str, Colour] | None = None
+        ) -> None:
+        super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours)
+
+        self.trigger = trigger
+        self.content = content
+        self.expanded = False
+
+    def toggle(self) -> None:
+        self.expanded = not self.expanded
+
+    def draw_default(self, surface: Surface, theme: SupportsGetItemColour) -> None:
+        if self.expanded:
+            self.trigger.draw_default(surface, theme)
+            self.content.draw_default(surface, theme)
+        else:
+            self.trigger.draw_default(surface, theme)

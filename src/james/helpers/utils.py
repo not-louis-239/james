@@ -19,8 +19,8 @@ from typing import overload
 
 import pygame as pg
 
-from james.helpers.base_elem import Element
 from james._internals.constants import DUMMY_BLACK
+from james.helpers.base_elem import Element
 from james.helpers.custom_types import Colour, IntCoord2
 
 

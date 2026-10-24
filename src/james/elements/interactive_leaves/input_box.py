@@ -21,8 +21,7 @@ import pygame as pg
 
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import Colour, SupportsGetItemColour
-from james.helpers.utils import get_text_surf, wrap_text, clamp
-
+from james.helpers.utils import clamp, get_text_surf, wrap_text
 
 _COMMAND_KEY = pg.KMOD_CTRL if sys.platform == "win32" else pg.KMOD_META
 

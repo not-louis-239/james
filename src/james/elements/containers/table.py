@@ -17,10 +17,9 @@ from typing import Any
 
 import pygame as pg
 
-from james.helpers.custom_types import Colour
-from james.helpers.base_elem import Element
-from james.helpers.custom_types import DrawFunc, SupportsGetItemColour
 from james.elements.containers.alignment_boxes import HBox
+from james.helpers.base_elem import Element
+from james.helpers.custom_types import Colour, DrawFunc, SupportsGetItemColour
 
 
 class Table(Element):

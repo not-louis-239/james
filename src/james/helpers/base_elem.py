@@ -20,8 +20,8 @@ from typing import Any
 
 import pygame as pg
 
-from ..helpers import renderer as _renderer
-from .custom_types import Colour, SupportsGetItemColour, DrawFunc
+from james.helpers import renderer as _renderer
+from james.helpers.custom_types import Colour, DrawFunc, SupportsGetItemColour
 
 
 class Element(ABC):

@@ -19,9 +19,9 @@ from typing import Any
 
 import pygame as pg
 
+from james._internals.img_cache import img_cache
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import Colour, IntCoord2, SupportsGetItemColour
-from james._internals.img_cache import img_cache
 from james.helpers.utils import get_text_surf, resize_to_fit
 
 

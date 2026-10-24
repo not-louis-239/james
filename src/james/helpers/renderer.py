@@ -13,8 +13,7 @@
 # limitations under the License.
 
 
-from .custom_types import DrawFunc
-
+from james.helpers.custom_types import DrawFunc
 
 DEFAULT_RENDERER: DrawFunc | None = None
 
