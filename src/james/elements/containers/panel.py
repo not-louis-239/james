@@ -24,11 +24,11 @@ from james.helpers.custom_types import Colour, DrawFunc, SupportsGetItemColour
 class Panel(Element):
     """A simple panel that can contain one child with padding."""
     def __init__(
-            self, *, flex: float = 0, shrink: float = 0.0,
+            self, child: Element | None = None,
+            *, flex: float = 0, shrink: float = 0.0,
             draw_attrs: dict[str, Any] | None = None,
             colours: dict[str, Colour] | None = None,
-            horiz_padding: int = 0, vert_padding: int = 0,
-            child: Element | None = None,
+            horiz_padding: int = 0, vert_padding: int | None = None,
             k_bg: str | None = None,
             k_border: str | None = None,
             border_w: int = 0,
@@ -36,7 +36,7 @@ class Panel(Element):
         ) -> None:
         super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours)
         self.horiz_padding = horiz_padding
-        self.vert_padding = vert_padding
+        self.vert_padding = vert_padding if vert_padding is not None else horiz_padding
 
         self.child = child
         if child is not None:
@@ -49,8 +49,17 @@ class Panel(Element):
         self.k_border = k_border
         self.border_w = border_w
 
-    def collides(self, pos: tuple[int, int]) -> bool:
-        return self.rect.collidepoint(pos)
+    def hit_test(self, pos: tuple[int, int]) -> Element | None:
+        if not self.rect.collidepoint(pos):
+            return None
+
+        if (
+            self.child is not None
+            and (hit := self.child.hit_test(pos))
+        ):
+            return hit
+
+        return self
 
     def preferred_size(self) -> tuple[int, int]:
         if not self.child:

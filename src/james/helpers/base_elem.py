@@ -91,6 +91,7 @@ class Element(ABC):
             child._set_visibility(val)
 
     def update(self, dt_s: float) -> None:
+        """Note: only updates `self`, not its children."""
         pass
 
     def invalidate_layout(self) -> None:
@@ -106,6 +107,10 @@ class Element(ABC):
         # Propagate shrink unless an override is set
         if self._fixed_shrink is None:
             self.shrink = self.shrink + child.shrink
+
+        # Layout shouldn't be trusted
+        if not self.layout_dirty:
+            self.invalidate_layout()
 
     @property
     def parents(self) -> list[Element]:
@@ -141,15 +146,19 @@ class Element(ABC):
         """Convert a global position to a local position within this element."""
         return pos
 
-    def collides(self, pos: tuple[int, int]) -> bool:
-        """Check if the UI element collides with the given position.
-        This is not about whether the element should be receptive to
-        user input, rather, whether an element "eats" or "uses up"
-        a user input at `pos`.
-        e.g. an input-blocking `Label` should still `collide`
-        with a mouse click at `pos`.
-        Elements are assumed to not consume user input by default."""
-        return False
+    def _contains_point(self, pos: tuple[int, int]) -> bool:
+        """Return whether an `Element` encompasses a point at `pos`.
+        This determines where an `Element` should begin to search its
+        children if a click is received at `pos`."""
+        return self.rect.collidepoint(pos)
+
+    def hit_test(self, pos: tuple[int, int]) -> Element | None:
+        """Given a `pos` in this element's parent's coordinate system,
+        return the deepest element in the subtree contained by `self`
+        that can receive pointer interaction at `pos`.
+
+        If no such element is found, return `None`."""
+        return self if self._contains_point(pos) else None
 
     @abstractmethod
     def preferred_size(self) -> tuple[int, int]:

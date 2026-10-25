@@ -43,6 +43,15 @@ class Collapsible(Element):
 
         self.expanded = False
 
+    def hit_test(self, pos: tuple[int, int]) -> Element | None:
+        if trigger_hit := self.trigger.hit_test(pos):
+            return trigger_hit
+
+        if self.expanded and (content_hit := self.content.hit_test(pos)):
+            return content_hit
+
+        return None
+
     def preferred_size(self) -> tuple[int, int]:
         trigger_w, trigger_h = self.trigger.preferred_size()
         content_w, content_h = self.content.preferred_size()
@@ -141,6 +150,7 @@ class Collapsible(Element):
 
     def toggle(self) -> None:
         self.expanded = not self.expanded
+        self.invalidate_layout()
 
     def draw_default(self, surface: Surface, theme: SupportsGetItemColour) -> None:
         if self.expanded:

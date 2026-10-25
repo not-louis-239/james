@@ -25,6 +25,9 @@ class Spacer(Element):
         self.min_w = min_w
         self.min_h = min_h
 
+    def hit_test(self, pos: tuple[int, int]) -> Element | None:
+        return None
+
     def preferred_size(self) -> tuple[int, int]:
         return (self.min_w, self.min_h)
 

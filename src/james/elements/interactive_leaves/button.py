@@ -20,7 +20,7 @@ import pygame as pg
 
 from james._internals.img_cache import img_cache
 from james.helpers.base_elem import Element
-from james.helpers.custom_types import Colour, IntCoord2, SupportsGetItemColour
+from james.helpers.custom_types import Colour, SupportsGetItemColour
 from james.helpers.utils import get_text_surf, resize_to_fit
 
 
@@ -165,12 +165,10 @@ class CircleButton(_Button):
         )
         self.r = r
 
-    def collides(self, pos: tuple[int, int]) -> bool:
-        if self.disabled or not self.visible:
-            return False
+    def hit_test(self, pos: tuple[int, int]) -> Element | None:
         dx = pos[0] - self.rect.centerx
         dy = pos[1] - self.rect.centery
-        return dx * dx + dy * dy <= self.r * self.r
+        return self if (dx * dx) + (dy * dy) <= (self.r * self.r) else None
 
     def draw_primitive(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         """Draws a primitive, borderless circular button."""

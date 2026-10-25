@@ -30,7 +30,7 @@ class ScrollableDisplay(Element):
             self, *, flex: float = 0, shrink: float = 0.0,
             draw_attrs: dict[str, Any] | None = None,
             colours: dict[str, Colour] | None = None,
-            padding: int = 0,
+            internal_padding: int = 0,
             child: Element,
             renderer: DrawFunc | None = None,
             k_bg: str | None = None,
@@ -38,7 +38,7 @@ class ScrollableDisplay(Element):
             border_w: int = 0
         ) -> None:
         super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours)
-        self.padding = padding
+        self.internal_padding = internal_padding
 
         self.child = child
         self.children = [child]
@@ -67,30 +67,37 @@ class ScrollableDisplay(Element):
         self.renderer(self.internal_surface, self.child, theme)
 
     def to_local(self, pos: tuple[int, int]) -> tuple[int, int]:
-        dx, dy = pos[0] - self.rect.x - self.padding, pos[1] - self.rect.y - self.padding
+        dx, dy = pos[0] - self.rect.x, pos[1] - self.rect.y
         s_x, s_y = self.physics.disp
         return int(dx + s_x), int(dy + s_y)
 
-    def collides(self, pos: tuple[int, int]) -> bool:
-        return self.rect.collidepoint(pos)
+    def hit_test(self, pos: tuple[int, int]) -> Element | None:
+        if not self.rect.collidepoint(pos):
+            return None
+
+        pos = self.to_local(pos)
+
+        if (hit := self.child.hit_test(pos)) is not None:
+            return hit
+
+        return self
 
     def get_displayable_rect(self) -> pg.Rect:
-        return pg.Rect(self.physics.disp.x, self.physics.disp.y, self.rect.width - 2 * self.padding, self.rect.height - 2 * self.padding)
+        return pg.Rect(self.physics.disp.x, self.physics.disp.y, self.rect.width - 2 * self.internal_padding, self.rect.height - 2 * self.internal_padding)
 
     def blit_relevant_surf(self, dest_surface: pg.Surface) -> None:
         """Blits the relevant portion of `self.internal_surface` to `dest_surface`."""
         displayable_rect = self.get_displayable_rect()
-        dest_surface.blit(self.internal_surface, (self.rect.x + self.padding, self.rect.y + self.padding), area=displayable_rect)
+        dest_surface.blit(self.internal_surface, (self.rect.x + self.internal_padding, self.rect.y + self.internal_padding), area=displayable_rect)
 
     def update(self, dt_s: float) -> None:
         child_max_x, child_max_y = self.child.preferred_size()
-        self.physics.disp_botright.x = max(0, child_max_x + 2 * self.padding - self.rect.width)
-        self.physics.disp_botright.y = max(0, child_max_y + 2 * self.padding - self.rect.height)
+        self.physics.disp_botright.x = max(0, child_max_x + 2 * self.internal_padding - self.rect.width)
+        self.physics.disp_botright.y = max(0, child_max_y + 2 * self.internal_padding - self.rect.height)
         self.physics.update(dt_s=dt_s)
 
     def handle_scroll(self, event: pg.event.Event) -> None:
-        if self.rect.collidepoint(pg.mouse.get_pos()):
-            self.physics.handle_scroll(event)
+        self.physics.handle_scroll(event)
 
     def draw_primitive(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         """Draw the content of `self` to the given surface (borderless)."""
@@ -112,7 +119,7 @@ class ScrollableDisplay(Element):
 
     def preferred_size(self) -> tuple[int, int]:
         cw, ch = self.child.preferred_size()
-        return cw + 2 * self.padding, ch + 2 * self.padding
+        return cw + 2 * self.internal_padding, ch + 2 * self.internal_padding
 
     def layout(self, rect: pg.Rect) -> None:
         # Layout oneself to the rect to which it has been assigned (from a parent)

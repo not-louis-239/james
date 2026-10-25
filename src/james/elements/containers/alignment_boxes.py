@@ -37,13 +37,9 @@ class _Box(Element):
 
     def __init__(
             self, *children: Element, flex: float = 0, shrink: float | None = None,
-            padding: int = 0, gap: int = 0,
-            renderer: DrawFunc | None = None,
+            gap: int = 0, renderer: DrawFunc | None = None,
         ) -> None:
-        """Initialises a new box.
-        padding = space between the box's edge and the first or last child
-        gap     = space between children in the box
-
+        """Initialises a new box, with an optional `gap` between its children.
         Flex must be provided explicitly for a box to propagate extra space downwards.
         Shrink is propagated implicitly unless an override is specified."""
 
@@ -52,7 +48,6 @@ class _Box(Element):
             shrink=shrink if shrink is not None else sum(c.shrink for c in children)
         )
 
-        self.padding = padding
         self.gap = gap
 
         self._set_renderer(renderer)
@@ -60,6 +55,16 @@ class _Box(Element):
         if children is not None:
             for child in children:
                 self.add_child(child)
+
+    def hit_test(self, pos: tuple[int, int]) -> Element | None:
+        if not self.rect.collidepoint(pos):
+            return None
+
+        for child in self.children[::-1]:
+            if (hit := child.hit_test(pos)) is not None:
+                return hit
+
+        return None
 
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         if not self.visible:
@@ -84,11 +89,7 @@ class HBox(_Box):
         # add gap between children
         total_w += self.gap * max(0, len(self.children) - 1)
 
-        # add padding
-        total_w += self.padding * 2
-        total_h = max_h + self.padding * 2
-
-        return (total_w, total_h)
+        return (total_w, max_h)
 
     def layout(self, rect: pg.Rect) -> None:
         self.rect = rect
@@ -107,7 +108,6 @@ class HBox(_Box):
         total_gaps = self.gap * max(0, len(self.children) - 1)
         remaining = (
             rect.width
-            - 2 * self.padding
             - sum(preferred_widths.values())
             - total_gaps
         )
@@ -132,9 +132,9 @@ class HBox(_Box):
                 widths[c] = max(0, widths[c] - shrink_amount)
 
         # Arrange children
-        h = rect.height - 2 * self.padding
-        x = rect.x + self.padding
-        y = rect.y + self.padding
+        h = rect.height
+        x = rect.x
+        y = rect.y
 
         for child in self.children:
             w = widths[child]
@@ -158,11 +158,7 @@ class VBox(_Box):
         # add gaps
         total_h += self.gap * max(0, len(self.children) - 1)
 
-        # add padding
-        total_h += self.padding * 2
-        total_w = max_w + self.padding * 2
-
-        return total_w, total_h
+        return max_w, total_h
 
     def layout(self, rect: pg.Rect) -> None:
         self.rect = rect
@@ -181,7 +177,6 @@ class VBox(_Box):
         total_gaps = self.gap * max(0, len(self.children) - 1)
         remaining = (
             rect.height
-            - 2 * self.padding
             - sum(preferred_heights.values())
             - total_gaps
         )
@@ -206,9 +201,9 @@ class VBox(_Box):
                 heights[c] = max(0, heights[c] - shrink_amount)
 
         # Arrange children
-        w = rect.width - 2 * self.padding
-        x = rect.x + self.padding
-        y = rect.y + self.padding
+        w = rect.width
+        x = rect.x
+        y = rect.y
 
         for child in self.children:
             h = heights[child]

@@ -43,6 +43,7 @@ class Label(Element):
 
     def set_text(self, text: str) -> None:
         self.text = text
+        self.invalidate_layout()
 
     def preferred_size(self) -> tuple[int, int]:
         text_w, text_h = self.font.size(self.text)

@@ -20,10 +20,16 @@ from james.helpers.custom_types import DrawFunc, SupportsGetItemColour
 from james.helpers import renderer as _renderer
 
 
+def _propagate_update(elem: Element, dt_s: float) -> None:
+    elem.update(dt_s)
+    for c in elem.children:
+        _propagate_update(c, dt_s)
+
+
 class GUI:
-    def __init__(self, layers: list[Element], renderer: DrawFunc | None):
+    def __init__(self, *layers: Element, renderer: DrawFunc | None):
         """Each layer in `layers` is treated as its own separate root element."""
-        self.layers = layers
+        self.layers = list(layers)
 
         self.hovered: Element | None = None
         self.pressed: Element | None = None
@@ -41,34 +47,22 @@ class GUI:
 
         self.renderer = chosen
 
-    def _hit_test_element(self, elem: Element, pos: tuple[int, int]) -> Element | None:
-        """Hit-test a single element to see if it or any of its children
-        are under the given `pos`, returning the element, or None if no element is found."""
-
-        local_pos = elem.to_local(pos)
-
-        for child in reversed(elem.children):
-            result = self._hit_test_element(child, local_pos)
-
-            if result is not None:
-                return result
-
-        if elem.collides(local_pos):
-            return elem
-
-        return None
-
     def hit_test(self, pos: tuple[int, int]) -> Element | None:
-        """Returns the element under the given position, or None if no element is found."""
+        """Returns the element under the given position,
+        that is willing to accept a user input at `pos`,
+        or None if no such element is found."""
 
         for root in self.layers[::-1]:
-            if (elem := self._hit_test_element(root, pos)):
-                return elem
+            if (hit := root.hit_test(pos)) is not None:
+                return hit
 
         return None
 
     def update(self, dt_s: float) -> None:
         new_hovered = self.hit_test(pg.mouse.get_pos())
+
+        for layer in self.layers:
+            _propagate_update(layer, dt_s)
 
         if pg.mouse.get_pressed()[0]:
             new_pressed = new_hovered
