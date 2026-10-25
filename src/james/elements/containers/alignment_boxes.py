@@ -39,7 +39,6 @@ class _Box(Element):
             self, *children: Element, flex: float = 0, shrink: float | None = None,
             padding: int = 0, gap: int = 0,
             renderer: DrawFunc | None = None,
-            k_bg_colour: str | None = None,
         ) -> None:
         """Initialises a new box.
         padding = space between the box's edge and the first or last child
@@ -55,8 +54,6 @@ class _Box(Element):
 
         self.padding = padding
         self.gap = gap
-        self.k_bg_colour = k_bg_colour
-        self._fixed_shrink = shrink
 
         self._set_renderer(renderer)
 
@@ -64,19 +61,10 @@ class _Box(Element):
             for child in children:
                 self.add_child(child)
 
-    def add_child(self, child: Element) -> None:
-        self.children.append(child)
-        child.parent = self
-
-        if self._fixed_shrink is None:
-            self.shrink = self.shrink + child.shrink
-
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         if not self.visible:
             return
 
-        if self.k_bg_colour is not None:
-            pg.draw.rect(surface, theme[self.k_bg_colour], self.rect)
         for child in self.children:
             self.renderer(surface, child, theme)
 
@@ -104,6 +92,7 @@ class HBox(_Box):
 
     def layout(self, rect: pg.Rect) -> None:
         self.rect = rect
+        self.layout_dirty = False
 
         # Measure preferred sizes
         preferred_widths: dict[Element, float] = {
@@ -177,6 +166,7 @@ class VBox(_Box):
 
     def layout(self, rect: pg.Rect) -> None:
         self.rect = rect
+        self.layout_dirty = False
 
         # Measure preferred sizes
         preferred_heights: dict[Element, float] = {
@@ -233,7 +223,8 @@ class SBox(_Box):
 
     def __init__(
             self, child: Element, *,
-            forced_width: int | None = None, forced_height: int | None = None,
+            forced_width: int | None = None,
+            forced_height: int | None = None,
             renderer: DrawFunc | None = None,
             h_align: HAlign = HAlign.CENTRE,
             v_align: VAlign = VAlign.CENTRE,
@@ -258,6 +249,9 @@ class SBox(_Box):
         return (w, h)
 
     def layout(self, rect: pg.Rect) -> None:
+        self.rect = rect
+        self.layout_dirty = False
+
         if self.strict:
             child_rect = pg.Rect(0, 0, *rect.size)
         else:
@@ -281,5 +275,4 @@ class SBox(_Box):
             case VAlign.BOTTOM:
                 child_rect.bottom = rect.bottom
 
-        self.rect = rect
         self.child.layout(child_rect)

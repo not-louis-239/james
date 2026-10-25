@@ -36,14 +36,20 @@ class Element(ABC):
 
         self.flex = flex  # expand if there is excess space
         self.shrink = shrink  # shrink if there is insufficient space
+        self._fixed_shrink = shrink
+
         self.rect = pg.Rect(0, 0, 0, 0)
 
         self.children: list[Element] = []
         self.parent: Element | None = None
 
         self.visible: bool = True  # should I be seen?
-        self.active: bool = True  # do I accept user input?
         self.disabled: bool = False  # am I supposed to block user input?
+
+        self.layout_dirty: bool = True  # do I need to be re-laid out?
+
+        self.pressed: bool = False
+        self.hovered: bool = False
 
         # These dicts are to allow implementation of custom draw functions
         # and attaching custom attributes for drawing and colouring
@@ -78,6 +84,29 @@ class Element(ABC):
 
         self.renderer = chosen
 
+    def _set_visibility(self, val: bool) -> None:
+        """Set the visibility of the UI element and all of its children, if any."""
+        self.visible = val
+        for child in self.children:
+            child._set_visibility(val)
+
+    def update(self, dt_s: float) -> None:
+        pass
+
+    def invalidate_layout(self) -> None:
+        """Invalidate the layout of the element, and propagate it upwards."""
+        self.layout_dirty = True
+        if self.parent is not None:
+            self.parent.invalidate_layout()
+
+    def add_child(self, child: Element) -> None:
+        self.children.append(child)
+        child.parent = self
+
+        # Propagate shrink unless an override is set
+        if self._fixed_shrink is None:
+            self.shrink = self.shrink + child.shrink
+
     @property
     def parents(self) -> list[Element]:
         """Return the `Element`'s parent `Element`s."""
@@ -92,12 +121,6 @@ class Element(ABC):
 
         return parents
 
-    def _set_visibility(self, val: bool) -> None:
-        """Set the visibility of the UI element and all of its children, if any."""
-        self.visible = val
-        for child in self.children:
-            child._set_visibility(val)
-
     def hide(self) -> None:
         """Hide the UI element and all of its children, if any."""
         self._set_visibility(False)
@@ -110,8 +133,23 @@ class Element(ABC):
         """Toggle the visibility of the UI element.
         If it is currently invisible, call `show()`.
         If it is currently visible, call `hide()`.
+        And propagates the new value down to all of `self`'s children.
         """
         (self.show if self.visible else self.hide)()
+
+    def to_local(self, pos: tuple[int, int]) -> tuple[int, int]:
+        """Convert a global position to a local position within this element."""
+        return pos
+
+    def collides(self, pos: tuple[int, int]) -> bool:
+        """Check if the UI element collides with the given position.
+        This is not about whether the element should be receptive to
+        user input, rather, whether an element "eats" or "uses up"
+        a user input at `pos`.
+        e.g. an input-blocking `Label` should still `collide`
+        with a mouse click at `pos`.
+        Elements are assumed to not consume user input by default."""
+        return False
 
     @abstractmethod
     def preferred_size(self) -> tuple[int, int]:

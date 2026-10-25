@@ -49,6 +49,9 @@ class Panel(Element):
         self.k_border = k_border
         self.border_w = border_w
 
+    def collides(self, pos: tuple[int, int]) -> bool:
+        return self.rect.collidepoint(pos)
+
     def preferred_size(self) -> tuple[int, int]:
         if not self.child:
             return (self.horiz_padding * 2, self.vert_padding * 2)
@@ -69,6 +72,8 @@ class Panel(Element):
 
     def layout(self, rect: pg.Rect) -> None:
         self.rect = rect
+        self.layout_dirty = False
+
         if self.child:
             child_rect = rect.inflate(-2 * self.horiz_padding, -2 * self.vert_padding)
             self.child.layout(child_rect)

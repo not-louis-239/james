@@ -66,6 +66,14 @@ class ScrollableDisplay(Element):
         self.internal_surface.fill((0, 0, 0, 0))
         self.renderer(self.internal_surface, self.child, theme)
 
+    def to_local(self, pos: tuple[int, int]) -> tuple[int, int]:
+        dx, dy = pos[0] - self.rect.x - self.padding, pos[1] - self.rect.y - self.padding
+        s_x, s_y = self.physics.disp
+        return int(dx + s_x), int(dy + s_y)
+
+    def collides(self, pos: tuple[int, int]) -> bool:
+        return self.rect.collidepoint(pos)
+
     def get_displayable_rect(self) -> pg.Rect:
         return pg.Rect(self.physics.disp.x, self.physics.disp.y, self.rect.width - 2 * self.padding, self.rect.height - 2 * self.padding)
 
@@ -110,6 +118,7 @@ class ScrollableDisplay(Element):
         # Layout oneself to the rect to which it has been assigned (from a parent)
         # Then calculate the size of `self`'s internal rect and layout children according to it.
         self.rect = rect
+        self.layout_dirty = False
         self.child.layout(pg.Rect(0, 0, *self.child.preferred_size()))
 
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:

@@ -29,7 +29,7 @@ class ScrollPhysics:
         self.disp = pg.Vector2(0, 0)
         self.disp_topleft = pg.Vector2(disp_topleft)
         self.disp_botright = pg.Vector2(disp_botright)
-        self.vel = pg.Vector2(0, 0)
+        self.vel: pg.Vector2 = pg.Vector2(0, 0)
 
     def handle_scroll(self, event: pg.event.Event) -> None:
         if event.type == pg.MOUSEWHEEL:

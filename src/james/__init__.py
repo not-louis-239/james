@@ -23,32 +23,38 @@ UI library for pygame, designed to be modular and easy to use.
 from james.elements.collapsibles import collapsible
 from james.elements.containers import alignment_boxes, panel, scrollable_display, table
 from james.elements.interactive_leaves import button, input_box
-from james.elements.static_leaves import label, spacer
+from james.elements.static_leaves import label, spacer, divider
+from james.gui import gui_cls
 from james.helpers import base_elem, custom_types, renderer, utils
 
+
+# Renderer / GUI
 set_default_renderer = renderer.set_default_renderer
+GUI = gui_cls.GUI
 
-AmbientMessage = utils.AmbientMessage
-
+# Utilities
+Element = base_elem.Element
 Colour = custom_types.Colour
 SupportsGetItemColour = custom_types.SupportsGetItemColour
-
-Element = base_elem.Element
-
 HAlign = alignment_boxes.HAlign
 VAlign = alignment_boxes.VAlign
+AmbientMessage = utils.AmbientMessage
 
-Collapsible = collapsible.Collapsible
+# Containers
 HBox = alignment_boxes.HBox
 VBox = alignment_boxes.VBox
 SBox = alignment_boxes.SBox
+Collapsible = collapsible.Collapsible
 Table = table.Table
+Panel = panel.Panel
+ScrollableDisplay = scrollable_display.ScrollableDisplay
 
+# Interactive elements
 RectButton = button.RectButton
 CircleButton = button.CircleButton
-
-Spacer = spacer.Spacer
-ScrollableDisplay = scrollable_display.ScrollableDisplay
-Panel = panel.Panel
-Label = label.Label
 InputBox = input_box.InputBox
+
+# Static elements
+Spacer = spacer.Spacer
+Label = label.Label
+Divider = divider.Divider

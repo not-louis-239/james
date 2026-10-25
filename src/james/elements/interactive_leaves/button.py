@@ -13,7 +13,6 @@
 # limitations under the License.
 
 
-from abc import abstractmethod
 from pathlib import Path
 from typing import Any
 
@@ -35,13 +34,13 @@ class _Button(Element):
             img_inset: int = 0,
             k_bg_colour: str | None = None,
             k_bg_hovered: str | None = None,
-            k_bg_active: str | None = None,
+            k_bg_pressed: str | None = None,
             k_fg_colour: str,
             k_fg_hovered: str | None = None,
-            k_fg_active: str | None = None,
+            k_fg_pressed: str | None = None,
             k_border_colour: str | None = None,
             k_border_hovered: str | None = None,
-            k_border_active: str | None = None,
+            k_border_pressed: str | None = None,
             border_w: int = 0
         ) -> None:
         super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours)
@@ -54,15 +53,15 @@ class _Button(Element):
 
         self.k_bg_colour = k_bg_colour
         self.k_bg_hovered = k_bg_hovered if k_bg_hovered is not None else k_bg_colour
-        self.k_bg_active = k_bg_active if k_bg_active is not None else k_bg_colour
+        self.k_bg_pressed = k_bg_pressed if k_bg_pressed is not None else k_bg_colour
 
         self.k_fg_colour = k_fg_colour
         self.k_fg_hovered = k_fg_hovered if k_fg_hovered is not None else k_fg_colour
-        self.k_fg_active = k_fg_active if k_fg_active is not None else k_fg_colour
+        self.k_fg_pressed = k_fg_pressed if k_fg_pressed is not None else k_fg_colour
 
         self.k_border_colour = k_border_colour
         self.k_border_hovered = k_border_hovered if k_border_hovered is not None else k_border_colour
-        self.k_border_active = k_border_active if k_border_active is not None else k_border_colour
+        self.k_border_pressed = k_border_pressed if k_border_pressed is not None else k_border_colour
 
         self.border_w = border_w
 
@@ -71,63 +70,38 @@ class _Button(Element):
         text_size = self.font.size(self.text)
         return text_size[0] + self.inset * 2, text_size[1] + self.inset * 2
 
-    # XXX: check_overlaps() will currently break if a _Button is inside of a
-    # ScrollableDisplay or any other type of element where the apparent visual position
-    # is variable.
-
-    # To fix this, one would need to make an Element keep track of its parent,
-    # walk up the parent chain and account for any visual position offsets due to scrolling.
-    # But I can't be bothered to implement that yet.
-
-    @abstractmethod
-    def check_overlaps(self, pos: IntCoord2) -> bool:
-        """Check if a specific position overlaps with the 'hitbox' of the button."""
-        raise NotImplementedError
-
-    def check_hovered(self) -> bool:
-        """Check if the button is hovered by the mouse."""
-        return self.check_overlaps(pg.mouse.get_pos())
-
-    def check_held(self, button: int = 1) -> bool:
-        """Check if the button is being held down by the mouse."""
-        return self.check_overlaps(pg.mouse.get_pos()) and pg.mouse.get_pressed()[button - 1]
-
     @property
     def k_bg(self) -> str | None:
         return (
-            self.k_bg_active if self.check_held()
-            else self.k_bg_hovered if self.check_hovered()
+            self.k_bg_pressed if self.pressed
+            else self.k_bg_hovered if self.hovered
             else self.k_bg_colour
         )
 
     @property
     def k_fg(self) -> str | None:
         return (
-            self.k_fg_active if self.check_held()
-            else self.k_fg_hovered if self.check_hovered()
+            self.k_fg_pressed if self.pressed
+            else self.k_fg_hovered if self.hovered
             else self.k_fg_colour
         )
 
     @property
     def k_border(self) -> str | None:
         return (
-            self.k_border_active if self.check_held()
-            else self.k_border_hovered if self.check_hovered()
+            self.k_border_pressed if self.pressed
+            else self.k_border_hovered if self.hovered
             else self.k_border_colour
         )
 
 
 class RectButton(_Button):
-    def check_overlaps(self, pos: tuple[int, int]) -> bool:
-        if self.disabled or not self.visible:
-            return False
-        return self.rect.collidepoint(pos)
-
     def preferred_size(self) -> tuple[int, int]:
         return self.fixed_size or self._get_text_size_with_inset()
 
     def layout(self, rect: pg.Rect) -> None:
         self.rect = rect
+        self.layout_dirty = False
 
     def draw_primitive(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         """Draws a primitive, borderless rectangular button."""
@@ -171,32 +145,32 @@ class CircleButton(_Button):
             img_inset: int = 0,
             k_bg_colour: str | None = None,
             k_bg_hovered: str | None = None,
-            k_bg_active: str | None = None,
+            k_bg_pressed: str | None = None,
             k_fg_colour: str,
             k_fg_hovered: str | None = None,
-            k_fg_active: str | None = None,
+            k_fg_pressed: str | None = None,
             k_border_colour: str | None = None,
             k_border_hovered: str | None = None,
-            k_border_active: str | None = None,
+            k_border_pressed: str | None = None,
             border_w: int = 0
         ) -> None:
         super().__init__(
             flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours,
             text=text, font=font, inset=inset, fixed_size=fixed_size, img_path=img_path,
             img_inset=img_inset,
-            k_bg_colour=k_bg_colour, k_bg_hovered=k_bg_hovered, k_bg_active=k_bg_active,
-            k_fg_colour=k_fg_colour, k_fg_hovered=k_fg_hovered, k_fg_active=k_fg_active,
+            k_bg_colour=k_bg_colour, k_bg_hovered=k_bg_hovered, k_bg_pressed=k_bg_pressed,
+            k_fg_colour=k_fg_colour, k_fg_hovered=k_fg_hovered, k_fg_pressed=k_fg_pressed,
             k_border_colour=k_border_colour, k_border_hovered=k_border_hovered,
-            k_border_active=k_border_active, border_w=border_w
+            k_border_pressed=k_border_pressed, border_w=border_w
         )
         self.r = r
 
-    def check_overlaps(self, pos: tuple[int, int]) -> bool:
+    def collides(self, pos: tuple[int, int]) -> bool:
         if self.disabled or not self.visible:
             return False
         dx = pos[0] - self.rect.centerx
         dy = pos[1] - self.rect.centery
-        return dx ** 2 + dy ** 2 <= self.r ** 2
+        return dx * dx + dy * dy <= self.r * self.r
 
     def draw_primitive(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         """Draws a primitive, borderless circular button."""
@@ -237,3 +211,4 @@ class CircleButton(_Button):
 
     def layout(self, rect: pg.Rect) -> None:
         self.rect = rect
+        self.layout_dirty = False

@@ -67,6 +67,7 @@ class Label(Element):
 
     def layout(self, rect: pg.Rect) -> None:
         self.rect = rect
+        self.layout_dirty = False
 
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         if not self.visible:

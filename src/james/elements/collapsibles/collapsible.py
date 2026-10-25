@@ -13,9 +13,9 @@
 # limitations under the License.
 
 
-from typing import Any
+from typing import Any, Literal
 
-from pygame import Surface
+from pygame import Rect, Surface
 
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import Colour, SupportsGetItemColour
@@ -26,14 +26,118 @@ class Collapsible(Element):
             self, *,
             flex: float = 0, shrink: float = 0,
             trigger: Element, content: Element,
+            gap: int = 0,  # gap between trigger and content when expanded
             draw_attrs: dict[str, Any] | None = None,
-            colours: dict[str, Colour] | None = None
+            colours: dict[str, Colour] | None = None,
+            expand_direction: Literal["up", "down", "left", "right"] = "down",
         ) -> None:
         super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours)
 
         self.trigger = trigger
         self.content = content
+        self.gap = gap
+        self.expand_direction = expand_direction
+
+        self.add_child(trigger)
+        self.add_child(content)
+
         self.expanded = False
+
+    def preferred_size(self) -> tuple[int, int]:
+        trigger_w, trigger_h = self.trigger.preferred_size()
+        content_w, content_h = self.content.preferred_size()
+
+        if not self.expanded:
+            return trigger_w, trigger_h
+
+        if self.expand_direction in ["up", "down"]:
+            return (
+                max(trigger_w, content_w),
+                trigger_h + self.gap + content_h
+            )
+
+        return (
+            trigger_w + self.gap + content_w,
+            max(trigger_h, content_h),
+        )
+
+    def layout(self, rect: Rect) -> None:
+        self.rect = rect
+        self.layout_dirty = False
+
+        trigger_w, trigger_h = self.trigger.preferred_size()
+
+        # Not expanded
+        if not self.expanded:
+            self.trigger.layout(rect)
+            return
+
+        # Expand vertically
+        if self.expand_direction in ("up", "down"):
+            available_h = rect.height - trigger_h - self.gap
+
+            if self.expand_direction == "down":
+                trigger_rect = Rect(
+                    rect.x,
+                    rect.y,
+                    rect.width,
+                    trigger_h,
+                )
+                content_rect = Rect(
+                    rect.x,
+                    rect.y + trigger_h + self.gap,
+                    rect.width,
+                    available_h,
+                )
+
+            else:  # up
+                content_rect = Rect(
+                    rect.x,
+                    rect.y,
+                    rect.width,
+                    available_h,
+                )
+                trigger_rect = Rect(
+                    rect.x,
+                    rect.bottom - trigger_h,
+                    rect.width,
+                    trigger_h,
+                )
+
+        # Expand horizontally
+        else:
+            available_w = rect.width - trigger_w - self.gap
+
+            if self.expand_direction == "right":
+                trigger_rect = Rect(
+                    rect.x,
+                    rect.y,
+                    trigger_w,
+                    rect.height,
+                )
+                content_rect = Rect(
+                    rect.x + trigger_w + self.gap,
+                    rect.y,
+                    available_w,
+                    rect.height,
+                )
+
+            else:  # left
+                content_rect = Rect(
+                    rect.left,
+                    rect.y,
+                    available_w,
+                    rect.height,
+                )
+                trigger_rect = Rect(
+                    rect.right - trigger_w,
+                    rect.y,
+                    trigger_w,
+                    rect.height,
+                )
+
+        self.trigger.layout(trigger_rect)
+        self.content.layout(content_rect)
 
     def toggle(self) -> None:
         self.expanded = not self.expanded

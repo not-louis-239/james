@@ -41,8 +41,8 @@ class Table(Element):
         self.column_flexes = column_flexes or []
 
         self.children: list[HBox] = list(rows)  # type: ignore
-        for child in rows:
-            child.parent = self
+        for row in rows:
+            self.add_child(row)
 
         self._validate()
 
@@ -88,6 +88,7 @@ class Table(Element):
         self._validate()
 
         self.rect = rect
+        self.layout_dirty = False
 
         # Measurement pass - find the maximum width and height of each column and row
         preferred_sizes = [

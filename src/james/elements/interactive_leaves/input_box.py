@@ -50,12 +50,15 @@ class InputBox(Element):
             k_tooltip: str | None = None,
             k_bg_colour: str | None = None,
             k_bg_hovered: str | None = None,
+            k_bg_pressed: str | None = None,
             k_bg_active: str | None = None,
             k_fg_colour: str,
             k_fg_hovered: str | None = None,
+            k_fg_pressed: str | None = None,
             k_fg_active: str | None = None,
             k_border_colour: str | None = None,
             k_border_hovered: str | None = None,
+            k_border_pressed: str | None = None,
             k_border_active: str | None = None,
             k_cursor: str,
             k_bg_selection: str | None = None,
@@ -67,6 +70,8 @@ class InputBox(Element):
         self.text: str = ""
         self.font = font
         self.inset = inset
+
+        # whether the InputBox is currently ready to accept user input
         self.active = False
 
         self.sentinel_text = sentinel_text
@@ -80,15 +85,18 @@ class InputBox(Element):
 
         self.k_bg_colour = k_bg_colour
         self.k_bg_hovered = k_bg_hovered if k_bg_hovered is not None else k_bg_colour
-        self.k_bg_active = k_bg_active if k_bg_active is not None else k_bg_colour
+        self.k_bg_pressed = k_bg_pressed if k_bg_pressed is not None else k_bg_colour
+        self.k_bg_active = k_bg_active if k_bg_active is not None else self.k_bg_pressed
 
         self.k_fg_colour = k_fg_colour
         self.k_fg_hovered = k_fg_hovered if k_fg_hovered is not None else k_fg_colour
-        self.k_fg_active = k_fg_active if k_fg_active is not None else k_fg_colour
+        self.k_fg_pressed = k_fg_pressed if k_fg_pressed is not None else k_fg_colour
+        self.k_fg_active = k_fg_active if k_fg_active is not None else self.k_fg_pressed
 
         self.k_border_colour = k_border_colour
         self.k_border_hovered = k_border_hovered if k_border_hovered is not None else k_border_colour
-        self.k_border_active = k_border_active if k_border_active is not None else k_border_colour
+        self.k_border_pressed  = k_border_pressed if k_border_pressed is not None else k_border_colour
+        self.k_border_active = k_border_active if k_border_active is not None else self.k_border_pressed
 
         self.k_cursor = k_cursor
         self.k_bg_selection = k_bg_selection
@@ -103,14 +111,11 @@ class InputBox(Element):
         self._undo_stack: list[_EditState] = []
         self._redo_stack: list[_EditState] = []
 
-    def check_hovered(self) -> bool:
-        return self.rect.collidepoint(pg.mouse.get_pos())
-
     @property
     def k_bg(self) -> str | None:
         return (
             self.k_bg_active if self.active
-            else self.k_bg_hovered if self.check_hovered()
+            else self.k_bg_hovered if self.hovered
             else self.k_bg_colour
         )
 
@@ -119,7 +124,7 @@ class InputBox(Element):
         return (
             self.k_sentinel if not self.text
             else self.k_fg_active if self.active
-            else self.k_fg_hovered if self.check_hovered()
+            else self.k_fg_hovered if self.hovered
             else self.k_fg_colour
         )
 
@@ -127,7 +132,7 @@ class InputBox(Element):
     def k_border(self) -> str | None:
         return (
             self.k_border_active if self.active
-            else self.k_border_hovered if self.check_hovered()
+            else self.k_border_hovered if self.hovered
             else self.k_border_colour
         )
 
@@ -603,3 +608,4 @@ class InputBox(Element):
 
     def layout(self, rect) -> None:
         self.rect = rect
+        self.layout_dirty = False
