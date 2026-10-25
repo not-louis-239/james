@@ -32,7 +32,8 @@ class Panel(Element):
             k_bg: str | None = None,
             k_border: str | None = None,
             border_w: int = 0,
-            renderer: DrawFunc | None = None
+            renderer: DrawFunc | None = None,
+            interactive: bool = True
         ) -> None:
         super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours)
         self.horiz_padding = horiz_padding
@@ -48,6 +49,7 @@ class Panel(Element):
         self.k_bg = k_bg
         self.k_border = k_border
         self.border_w = border_w
+        self.interactive = interactive
 
     def hit_test(self, pos: tuple[int, int]) -> Element | None:
         if not self.rect.collidepoint(pos):
@@ -59,7 +61,7 @@ class Panel(Element):
         ):
             return hit
 
-        return self
+        return self if self.interactive else None
 
     def preferred_size(self) -> tuple[int, int]:
         if not self.child:
@@ -88,5 +90,8 @@ class Panel(Element):
             self.child.layout(child_rect)
 
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        if not self.visible:
+            return
+
         self.draw_primitive(surface, theme)
         self.draw_default_border(surface, theme)

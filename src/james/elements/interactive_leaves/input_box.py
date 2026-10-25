@@ -23,6 +23,7 @@ from james.helpers.base_elem import Element
 from james.helpers.custom_types import Colour, SupportsGetItemColour
 from james.helpers.utils import clamp, get_text_surf, wrap_text
 
+
 _COMMAND_KEY = pg.KMOD_CTRL if sys.platform == "win32" else pg.KMOD_META
 
 @dataclass
@@ -136,9 +137,12 @@ class InputBox(Element):
             else self.k_border_colour
         )
 
-    def _get_cursor_pos_from_mouse(self, mouse_x: int) -> int:
+    def _get_cursor_pos_from_x(self, x_pos: int) -> int:
+        """Get cursor position in terms of index from x-position in
+        local coordinates."""
+
         x = (
-            mouse_x
+            x_pos
             - self.rect.x
             - self.inset
             + self.scroll_offset
@@ -339,6 +343,7 @@ class InputBox(Element):
     def clear_tooltip(self) -> None:
         self.set_tooltip(None)
 
+    # TODO: refactor handle_input to separate it from global input
     def handle_input(self, keys: pg.key.ScancodeWrapper, events: list[pg.event.Event], dt_s: float) -> bool:
         """Handles user input and returns True if `self`'s contents were changed."""
 
@@ -360,7 +365,7 @@ class InputBox(Element):
                 if self.rect.collidepoint(event.pos):
                     self.active = True
 
-                    self.cursor_pos = self._get_cursor_pos_from_mouse(event.pos[0])
+                    self.cursor_pos = self._get_cursor_pos_from_x(event.pos[0])
                     self.selection_anchor = self.cursor_pos
                     self.mouse_selecting = True
 
@@ -371,7 +376,7 @@ class InputBox(Element):
                     self.selection_anchor = None
 
             elif event.type == pg.MOUSEMOTION and self.mouse_selecting:
-                self.cursor_pos = self._get_cursor_pos_from_mouse(event.pos[0])
+                self.cursor_pos = self._get_cursor_pos_from_x(event.pos[0])
                 self.cursor_flash_time = 0
 
             elif event.type == pg.MOUSEBUTTONUP and event.button == 1:

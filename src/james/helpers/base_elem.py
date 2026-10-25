@@ -24,6 +24,11 @@ from james.helpers import renderer as _renderer
 from james.helpers.custom_types import Colour, DrawFunc, SupportsGetItemColour
 
 
+# TODO: make hit_test easily inheritable, with a visibility check
+# TODO: self.visible MUST affect both hit_test and drawing, AND layout
+#  - invisible elements are not laid out
+
+
 class Element(ABC):
     def __init__(
             self, *, flex: float = 0.0, shrink: float = 0.0,
@@ -44,12 +49,11 @@ class Element(ABC):
         self.parent: Element | None = None
 
         self.visible: bool = True  # should I be seen?
-        self.disabled: bool = False  # am I supposed to block user input?
-
         self.layout_dirty: bool = True  # do I need to be re-laid out?
 
         self.pressed: bool = False
         self.hovered: bool = False
+        self.disabled: bool = False  # am I supposed to block user input?
 
         # These dicts are to allow implementation of custom draw functions
         # and attaching custom attributes for drawing and colouring
@@ -87,6 +91,7 @@ class Element(ABC):
     def _set_visibility(self, val: bool) -> None:
         """Set the visibility of the UI element and all of its children, if any."""
         self.visible = val
+        self.layout_dirty = True
         for child in self.children:
             child._set_visibility(val)
 

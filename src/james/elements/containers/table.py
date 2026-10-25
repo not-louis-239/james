@@ -40,7 +40,6 @@ class Table(Element):
         self.row_flexes = row_flexes or []
         self.column_flexes = column_flexes or []
 
-        self.children: list[HBox] = list(rows)  # type: ignore
         for row in rows:
             self.add_child(row)
 
@@ -132,13 +131,15 @@ class Table(Element):
         cell_left, cell_top = rect.topleft
 
         for rn, row in enumerate(self.children):
+            row.rect = pg.Rect(cell_left, cell_top, sum(column_widths), row_heights[rn])
+
             for cn, cell in enumerate(row.children):
                 cell.layout(pg.Rect(
                     cell_left + self.cell_inset, cell_top + self.cell_inset,
                     max(0, column_widths[cn] - 2 * self.cell_inset), max(0, row_heights[rn] - 2 * self.cell_inset)
                 ))
                 cell_left += column_widths[cn]
-            row.rect = pg.Rect(cell_left, cell_top, sum(column_widths), row_heights[rn])
+
             cell_left = rect.left
             cell_top += row_heights[rn]
 
