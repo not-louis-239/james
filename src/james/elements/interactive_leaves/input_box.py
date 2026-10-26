@@ -604,6 +604,13 @@ class InputBox(Element):
         if self.border_w and self.k_border is not None:
             pg.draw.rect(surface, theme[self.k_border], rect, self.border_w)
 
+    def preferred_size(self) -> tuple[int, int]:
+        return (0, self.font.get_height() + 2 * self.inset)
+
+    def layout(self, rect) -> None:
+        self.rect = rect
+        self.layout_dirty = False
+
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         if not self.visible:
             return
@@ -618,9 +625,3 @@ class InputBox(Element):
         self.draw_tooltip(surface, theme)
         self.draw_default_tooltip_border(surface, theme)
 
-    def preferred_size(self) -> tuple[int, int]:
-        return (0, self.font.get_height() + 2 * self.inset)
-
-    def layout(self, rect) -> None:
-        self.rect = rect
-        self.layout_dirty = False

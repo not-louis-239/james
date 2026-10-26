@@ -17,6 +17,7 @@ from typing import Any
 
 import pygame as pg
 
+from james._internals.constants import HITBOX_COLOUR_0, HITBOX_COLOUR_1, HITBOX_COLOUR_2, HITBOX_W
 from james.elements.containers.alignment_boxes import HBox
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import Colour, DrawFunc, SupportsGetItemColour
@@ -47,6 +48,15 @@ class Table(Element):
 
         self._validate()
 
+    def draw_hitbox(self, surface: pg.Surface) -> None:
+        pg.draw.rect(surface, HITBOX_COLOUR_0, self.rect, HITBOX_W)
+
+        for row in self.children:
+            pg.draw.rect(surface, HITBOX_COLOUR_1, row.rect, HITBOX_W)
+
+            for cell in row.children:
+                pg.draw.rect(surface, HITBOX_COLOUR_2, cell.rect, HITBOX_W)
+
     def _validate(self) -> None:
         length = len(self.children[0].children)
         if not all(len(row.children) == length for row in self.children):
@@ -68,10 +78,14 @@ class Table(Element):
 
     def preferred_size(self) -> tuple[int, int]:
         # Measurement pass - find the maximum width and height of each column and row
-        preferred_sizes = [
-            [c.preferred_size() for c in row.children]
-            for row in self.children
-        ]
+        preferred_sizes: list[list[tuple[int, int]]] = []
+
+        for row in self.children:
+            row_sizes: list[tuple[int, int]] = []
+            for cell in row.children:
+                cell_w, cell_h = cell.preferred_size()
+                row_sizes.append((cell_w + 2 * self.cell_inset, cell_h + 2 * self.cell_inset))
+            preferred_sizes.append(row_sizes)
 
         # Row heights
         row_heights = [max(size[1] for size in row) for row in preferred_sizes]

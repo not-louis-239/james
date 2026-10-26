@@ -29,3 +29,8 @@ DUMMY_SURFACE = pg.Surface((1, 1), flags=pg.SRCALPHA)
 
 # default constants
 HOVER_TOOLTIP_MARGIN = 10
+
+HITBOX_COLOUR_0 = (255, 0, 255)
+HITBOX_COLOUR_1 = (0, 255, 255)
+HITBOX_COLOUR_2 = (255, 255, 0)
+HITBOX_W = 1

@@ -20,6 +20,7 @@ from typing import Any, TYPE_CHECKING
 
 import pygame as pg
 
+from james._internals.constants import HITBOX_COLOUR_0, HITBOX_W
 from james.helpers import renderer as _renderer
 from james.helpers.custom_types import Colour, DrawFunc, SupportsGetItemColour
 
@@ -84,6 +85,10 @@ class Element(ABC):
         self.draw_attrs = draw_attrs or {}
         self.colours = colours or {}
         self.hover_tooltip = hover_tooltip
+
+    def draw_hitbox(self, surface: pg.Surface) -> None:
+        """Draw the hitbox of the UI element."""
+        pg.draw.rect(surface, HITBOX_COLOUR_0, self.rect, HITBOX_W)
 
     def _set_renderer(self, renderer: DrawFunc | None) -> None:
         chosen = renderer or _renderer.DEFAULT_RENDERER
@@ -174,20 +179,29 @@ class Element(ABC):
         that can receive pointer interaction at `pos`.
         If no such element is found, return `None`."""
 
+        # print(f"[id:{id(self)}] Hit testing element '{type(self).__name__}', rect: {self.rect}")
+        
         if not self.visible:
+            # print(f"[id:{id(self)}] Invisible element: returning None")
             return None
 
         if not self._contains_point(pos):
+            # print(f"[id:{id(self)}] Point not contained in element: returning None")
             return None
 
         pos = self.to_local(pos)
+        # print(f"[id:{id(self)}] Point contained in element.")
 
         for child in self.children[::-1]:
+            # print(f"[id:{id(child)}] Checking child '{type(child).__name__}', id: {id(child)}")
             if (hit := child.hit_test(pos)):
+                # print(f"[id:{id(child)}] Child hit test returned '{type(hit).__name__}', id: {id(hit)}")
                 return hit
 
         if self.interactive:
+            # print(f"[id:{id(self)}] Interactive element: returning self")
             return self
+        # print(f"[id:{id(self)}] No child hit test returned, returning None")
         return None
 
     @abstractmethod
