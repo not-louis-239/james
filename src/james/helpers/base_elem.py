@@ -159,7 +159,7 @@ class Element(ABC):
         If it is currently visible, call `hide()`.
         And propagates the new value down to all of `self`'s children.
         """
-        (self.show if self.visible else self.hide)()
+        (self.hide if self.visible else self.show)()
 
     def to_local(self, pos: tuple[int, int]) -> tuple[int, int]:
         """Convert a global position to a local position within this element."""
@@ -180,7 +180,7 @@ class Element(ABC):
         If no such element is found, return `None`."""
 
         # print(f"[id:{id(self)}] Hit testing element '{type(self).__name__}', rect: {self.rect}")
-        
+
         if not self.visible:
             # print(f"[id:{id(self)}] Invisible element: returning None")
             return None

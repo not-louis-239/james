@@ -15,7 +15,7 @@
 
 import pygame as pg
 
-from james._internals.constants import HOVER_TOOLTIP_MARGIN
+from james._internals.constants import HOVER_TOOLTIP_MARGIN, DUMMY_SURFACE
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import DrawFunc, SupportsGetItemColour
 from james.helpers import renderer as _renderer
@@ -38,7 +38,16 @@ class GUI:
         self.hovered: Element | None = None
         self.pressed: Element | None = None
         self.tooltip_margin = hover_tooltip_margin
+        self.work_surface: pg.Surface = DUMMY_SURFACE
         self._set_renderer(renderer)
+
+    def _prepare_work_surface(self, dims: tuple[int, int]) -> None:
+        """Prepare a work surface of the correct size for drawing
+        and clear it."""
+
+        if self.work_surface.size != dims:
+            self.work_surface = pg.Surface(dims, pg.SRCALPHA)
+        self.work_surface.fill((0, 0, 0, 0))
 
     def _set_renderer(self, renderer: DrawFunc | None) -> None:
         chosen = renderer or _renderer.DEFAULT_RENDERER
@@ -106,17 +115,20 @@ class GUI:
 
     def draw(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         for root in self.layers:
-            self.renderer(surface, root, theme)
+            self._prepare_work_surface(surface.size)
+            self.renderer(self.work_surface, root, theme)
+            surface.blit(self.work_surface, (0, 0))
 
         # Draw hover tooltip
         if self.hovered and self.hovered.hover_tooltip is not None:
+
             # Calculate label position
             # Prefer bottom-right, but if there isn't enough space,
             # switch between bottom<->top or right<->left.
 
             mx, my = pg.mouse.get_pos()
             label = self.hovered.hover_tooltip
-            label_w, label_h = label.rect.size
+            label_w, label_h = label.preferred_size()
             label_rect = pg.Rect(mx + self.tooltip_margin, my + self.tooltip_margin, label_w, label_h)
 
             if label_rect.right > surface.get_width():
@@ -127,4 +139,7 @@ class GUI:
                 label_rect.bottom = my - self.tooltip_margin
 
             # Draw label
-            self.renderer(surface, label, theme)
+            label.layout(label_rect)
+            self._prepare_work_surface(surface.size)
+            self.renderer(self.work_surface, label, theme)
+            surface.blit(self.work_surface, (0, 0))
