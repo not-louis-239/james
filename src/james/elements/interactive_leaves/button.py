@@ -22,6 +22,7 @@ from james._internals.img_cache import img_cache
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import Colour, SupportsGetItemColour
 from james.helpers.utils import get_text_surf, resize_to_fit
+from james.elements.static_leaves.label import Label
 
 
 class _Button(Element):
@@ -41,7 +42,8 @@ class _Button(Element):
             k_border_colour: str | None = None,
             k_border_hovered: str | None = None,
             k_border_pressed: str | None = None,
-            border_w: int = 0
+            border_w: int = 0,
+            hover_label: Label | None = None,
         ) -> None:
         super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours)
         self.text = text
@@ -64,6 +66,8 @@ class _Button(Element):
         self.k_border_pressed = k_border_pressed if k_border_pressed is not None else k_border_colour
 
         self.border_w = border_w
+
+        self.hover_label = hover_label
 
     def _get_text_size_with_inset(self) -> tuple[int, int]:
         """Get text size, including inset."""
@@ -96,6 +100,9 @@ class _Button(Element):
 
 
 class RectButton(_Button):
+    def update(self, dt_s: float) -> None:
+        pass  # TODO: implement labels
+
     def preferred_size(self) -> tuple[int, int]:
         return self.fixed_size or self._get_text_size_with_inset()
 
@@ -165,10 +172,10 @@ class CircleButton(_Button):
         )
         self.r = r
 
-    def hit_test(self, pos: tuple[int, int]) -> Element | None:
+    def _contains_point(self, pos: tuple[int, int]) -> bool:
         dx = pos[0] - self.rect.centerx
         dy = pos[1] - self.rect.centery
-        return self if (dx * dx) + (dy * dy) <= (self.r * self.r) else None
+        return (dx * dx) + (dy * dy) <= (self.r * self.r)
 
     def draw_primitive(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         """Draws a primitive, borderless circular button."""

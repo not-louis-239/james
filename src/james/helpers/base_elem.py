@@ -24,7 +24,6 @@ from james.helpers import renderer as _renderer
 from james.helpers.custom_types import Colour, DrawFunc, SupportsGetItemColour
 
 
-# TODO: make hit_test easily inheritable, with a visibility check
 # TODO: self.visible MUST affect both hit_test and drawing, AND layout
 #  - invisible elements are not laid out
 
@@ -34,6 +33,7 @@ class Element(ABC):
             self, *, flex: float = 0.0, shrink: float = 0.0,
             draw_attrs: dict[str, Any] | None = None,
             colours: dict[str, Colour] | None = None,
+            interactive: bool = False
         ) -> None:
         # The ratios of flex or shrink for different UI components
         # determines how the excess or shortage of space is distributed
@@ -48,12 +48,20 @@ class Element(ABC):
         self.children: list[Element] = []
         self.parent: Element | None = None
 
+        # If an element is invisible, none of its children will be laid out,
+        # drawn or hit-tested. Visibility cascades downwards.
+
         self.visible: bool = True  # should I be seen?
         self.layout_dirty: bool = True  # do I need to be re-laid out?
 
         self.pressed: bool = False
         self.hovered: bool = False
         self.disabled: bool = False  # am I supposed to block user input?
+
+        # `interactive` is only applicable for containers.
+        # It dictates: if a click doesn't hit any of `self`'s children, whether
+        # `self` should take it.
+        self.interactive = interactive
 
         # These dicts are to allow implementation of custom draw functions
         # and attaching custom attributes for drawing and colouring
@@ -154,16 +162,32 @@ class Element(ABC):
     def _contains_point(self, pos: tuple[int, int]) -> bool:
         """Return whether an `Element` encompasses a point at `pos`.
         This determines where an `Element` should begin to search its
-        children if a click is received at `pos`."""
+        children if a click is received at `pos`.
+        Default hitbox is assumed to be the element's `rect`."""
+
         return self.rect.collidepoint(pos)
 
     def hit_test(self, pos: tuple[int, int]) -> Element | None:
         """Given a `pos` in this element's parent's coordinate system,
         return the deepest element in the subtree contained by `self`
         that can receive pointer interaction at `pos`.
-
         If no such element is found, return `None`."""
-        return self if self._contains_point(pos) else None
+
+        if not self.visible:
+            return None
+
+        if not self._contains_point(pos):
+            return None
+
+        pos = self.to_local(pos)
+
+        for child in self.children[::-1]:
+            if (hit := child.hit_test(pos)):
+                return hit
+
+        if self.interactive:
+            return self
+        return None
 
     @abstractmethod
     def preferred_size(self) -> tuple[int, int]:

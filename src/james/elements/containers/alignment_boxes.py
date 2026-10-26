@@ -56,16 +56,6 @@ class _Box(Element):
             for child in children:
                 self.add_child(child)
 
-    def hit_test(self, pos: tuple[int, int]) -> Element | None:
-        if not self.rect.collidepoint(pos):
-            return None
-
-        for child in self.children[::-1]:
-            if (hit := child.hit_test(pos)) is not None:
-                return hit
-
-        return None
-
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         if not self.visible:
             return

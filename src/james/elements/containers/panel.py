@@ -51,18 +51,6 @@ class Panel(Element):
         self.border_w = border_w
         self.interactive = interactive
 
-    def hit_test(self, pos: tuple[int, int]) -> Element | None:
-        if not self.rect.collidepoint(pos):
-            return None
-
-        if (
-            self.child is not None
-            and (hit := self.child.hit_test(pos))
-        ):
-            return hit
-
-        return self if self.interactive else None
-
     def preferred_size(self) -> tuple[int, int]:
         if not self.child:
             return (self.horiz_padding * 2, self.vert_padding * 2)

@@ -33,13 +33,6 @@ class Group(Element):
     def __iter__(self) -> Iterator[Element]:
         yield from self.children
 
-    def hit_test(self, pos: tuple[int, int]) -> Element | None:
-        for child in self.children[::-1]:
-            if (hit := child.hit_test(pos)) is not None:
-                return hit
-
-        return None
-
     def clear_children(self) -> None:
         """Remove all children from the group."""
         self.children.clear()
@@ -53,5 +46,8 @@ class Group(Element):
         self.layout_dirty = False
 
     def draw_default(self, surface: Surface, theme: SupportsGetItemColour) -> None:
+        if not self.visible:
+            return
+
         for child in self.children:
             child.draw_default(surface, theme)

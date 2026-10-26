@@ -37,7 +37,7 @@ class ScrollableDisplay(Element):
             k_border: str | None = None,
             border_w: int = 0
         ) -> None:
-        super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours)
+        super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours, interactive=True)
         self.internal_padding = internal_padding
 
         self.child = child
@@ -70,17 +70,6 @@ class ScrollableDisplay(Element):
         dx, dy = pos[0] - self.rect.x, pos[1] - self.rect.y
         s_x, s_y = self.physics.disp
         return int(dx + s_x), int(dy + s_y)
-
-    def hit_test(self, pos: tuple[int, int]) -> Element | None:
-        if not self.rect.collidepoint(pos):
-            return None
-
-        pos = self.to_local(pos)
-
-        if (hit := self.child.hit_test(pos)) is not None:
-            return hit
-
-        return self
 
     def get_displayable_rect(self) -> pg.Rect:
         return pg.Rect(self.physics.disp.x, self.physics.disp.y, self.rect.width - 2 * self.internal_padding, self.rect.height - 2 * self.internal_padding)

@@ -55,4 +55,7 @@ class Divider(Element):
         pg.draw.rect(surface, theme[self.k_fg], self.rect)
 
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        if not self.visible:
+            return
+
         self.draw_primitive(surface, theme)

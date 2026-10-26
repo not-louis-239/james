@@ -64,13 +64,6 @@ class Table(Element):
         elif num_column_flexes > num_cols:
             self.column_flexes = self.column_flexes[:num_cols]
 
-    def hit_test(self, pos: tuple[int, int]) -> Element | None:
-        for row in self.children[::-1]:
-            if (hit := row.hit_test(pos)) is not None:
-                return hit
-
-        return None
-
     def preferred_size(self) -> tuple[int, int]:
         # Measurement pass - find the maximum width and height of each column and row
         preferred_sizes = [
@@ -144,6 +137,9 @@ class Table(Element):
             cell_top += row_heights[rn]
 
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
+        if not self.visible:
+            return
+
         for row in self.children:
             for elem in row.children:
                 if elem.visible:
