@@ -19,12 +19,19 @@ from pygame import Rect, Surface
 
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import Colour, SupportsGetItemColour
+from james.elements.static_leaves.label import Label
 
 
 class Group(Element):
-    def __init__(self, *children: Element, flex: float = 1.0, draw_attrs: dict[str, Any] | None = None, colours: dict[str, Colour] | None = None) -> None:
+    def __init__(
+            self, *children: Element,
+            flex: float = 1.0,
+            draw_attrs: dict[str, Any] | None = None,
+            colours: dict[str, Colour] | None = None,
+            hover_tooltip: Label | None = None,
+        ) -> None:
         """Create a group of elements that aren't necessarily connected."""
-        super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours)
+        super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours, hover_tooltip=hover_tooltip)
         self.children = list(children)  # type: ignore
 
     def __getitem__(self, index: int) -> Element:

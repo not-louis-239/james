@@ -19,6 +19,7 @@ import pygame as pg
 
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import Colour, SupportsGetItemColour
+from james.elements.static_leaves.label import Label
 
 
 class Divider(Element):
@@ -31,9 +32,14 @@ class Divider(Element):
             draw_attrs: dict[str, Any] | None = None,
             colours: dict[str, Colour] | None = None,
             orientation: Literal["horiz", "vert"] = "horiz",
-            k_fg: str, thickness: int = 2
+            k_fg: str, thickness: int = 2,
+            hover_tooltip: Label | None = None,
         ) -> None:
-        super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours)
+        super().__init__(
+            flex=flex, draw_attrs=draw_attrs, colours=colours,
+            hover_tooltip=hover_tooltip, interactive=True
+        )
+
         self.orientation = orientation
         self.k_fg = k_fg
         self.thickness = thickness

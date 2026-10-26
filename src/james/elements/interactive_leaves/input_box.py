@@ -22,6 +22,7 @@ import pygame as pg
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import Colour, SupportsGetItemColour
 from james.helpers.utils import clamp, get_text_surf, wrap_text
+from james.elements.static_leaves.label import Label
 
 
 _COMMAND_KEY = pg.KMOD_CTRL if sys.platform == "win32" else pg.KMOD_META
@@ -34,6 +35,11 @@ class _EditState:
 
 
 class InputBox(Element):
+    """An InputBox with an optional attached tooltip. The attached tooltip
+    differs from the hover tooltip in that it appears as if it is attached
+    under the InputBox instead of appearing when the mouse hovers over the
+    InputBox."""
+
     CURSOR_FLASH_INTERVAL = 0.75
     CURSOR_VISUAL_W = 2
 
@@ -64,9 +70,13 @@ class InputBox(Element):
             k_cursor: str,
             k_bg_selection: str | None = None,
             k_sentinel: str | None = None,
-            text_size_limit: int = 255
+            text_size_limit: int = 255,
+            hover_tooltip: Label | None = None,
         ) -> None:
-        super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours)
+        super().__init__(
+            flex=flex, shrink=shrink, draw_attrs=draw_attrs,
+            colours=colours, hover_tooltip=hover_tooltip, interactive=True
+        )
 
         self.text: str = ""
         self.font = font

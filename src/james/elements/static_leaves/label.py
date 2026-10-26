@@ -13,6 +13,8 @@
 # limitations under the License.
 
 
+from __future__ import annotations
+
 from typing import Any
 
 import pygame as pg
@@ -29,9 +31,14 @@ class Label(Element):
             colours: dict[str, Colour] | None = None,
             text: str = "", font: pg.font.Font, inset: int = 0,
             k_fg: str, k_bg: str | None = None, k_border: str | None = None,
-            border_w: int = 0
+            border_w: int = 0,
+            hover_tooltip: Label | None = None
         ) -> None:
-        super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours)
+        super().__init__(
+            flex=flex, shrink=shrink, draw_attrs=draw_attrs,
+            colours=colours, hover_tooltip=hover_tooltip, interactive=True
+        )
+
         self.text = text
         self.font = font
         self.inset = inset

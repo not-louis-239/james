@@ -21,6 +21,7 @@ from james._internals.constants import DUMMY_SURFACE
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import Colour, DrawFunc, SupportsGetItemColour
 from james.helpers.scroll_physics import ScrollPhysics
+from james.elements.static_leaves.label import Label
 
 
 class ScrollableDisplay(Element):
@@ -35,9 +36,10 @@ class ScrollableDisplay(Element):
             renderer: DrawFunc | None = None,
             k_bg: str | None = None,
             k_border: str | None = None,
-            border_w: int = 0
+            border_w: int = 0,
+            hover_tooltip: Label | None = None
         ) -> None:
-        super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours, interactive=True)
+        super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours, interactive=True, hover_tooltip=hover_tooltip)
         self.internal_padding = internal_padding
 
         self.child = child

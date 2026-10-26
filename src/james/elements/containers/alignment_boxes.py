@@ -19,6 +19,7 @@ import pygame as pg
 
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import DrawFunc, SupportsGetItemColour
+from james.elements.static_leaves.label import Label
 
 
 class HAlign(StrEnum):
@@ -38,6 +39,7 @@ class _Box(Element):
     def __init__(
             self, *children: Element, flex: float = 0, shrink: float | None = None,
             gap: int = 0, renderer: DrawFunc | None = None,
+            hover_tooltip: Label | None = None,
         ) -> None:
         """Initialises a new box, with an optional `gap` between its children.
         Flex must be provided explicitly for a box to propagate extra space downwards.
@@ -45,7 +47,8 @@ class _Box(Element):
 
         super().__init__(
             flex=flex,
-            shrink=shrink if shrink is not None else sum(c.shrink for c in children)
+            shrink=shrink if shrink is not None else sum(c.shrink for c in children),
+            hover_tooltip=hover_tooltip
         )
 
         self.gap = gap
@@ -213,9 +216,10 @@ class SBox(_Box):
             renderer: DrawFunc | None = None,
             h_align: HAlign = HAlign.CENTRE,
             v_align: VAlign = VAlign.CENTRE,
-            strict: bool = False
+            strict: bool = False,
+            hover_tooltip: Label | None = None
         ) -> None:
-        super().__init__(renderer=renderer)
+        super().__init__(renderer=renderer, hover_tooltip=hover_tooltip)
         self.child = child
         self.children = [child]
 

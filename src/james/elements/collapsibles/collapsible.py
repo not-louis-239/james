@@ -19,6 +19,7 @@ from pygame import Rect, Surface
 
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import Colour, SupportsGetItemColour
+from james.elements.static_leaves.label import Label
 
 
 class Collapsible(Element):
@@ -30,8 +31,9 @@ class Collapsible(Element):
             draw_attrs: dict[str, Any] | None = None,
             colours: dict[str, Colour] | None = None,
             expand_direction: Literal["up", "down", "left", "right"] = "down",
+            hover_tooltip: Label | None = None,
         ) -> None:
-        super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours)
+        super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours, hover_tooltip=hover_tooltip)
 
         self.trigger = trigger
         self.content = content

@@ -25,3 +25,7 @@ __pronouns__: list[str] = ["he", "him"]
 # dummy values
 DUMMY_BLACK = (0, 0, 0)
 DUMMY_SURFACE = pg.Surface((1, 1), flags=pg.SRCALPHA)
+
+
+# default constants
+HOVER_TOOLTIP_MARGIN = 10

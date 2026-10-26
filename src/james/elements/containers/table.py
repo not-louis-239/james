@@ -20,6 +20,7 @@ import pygame as pg
 from james.elements.containers.alignment_boxes import HBox
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import Colour, DrawFunc, SupportsGetItemColour
+from james.elements.static_leaves.label import Label
 
 
 class Table(Element):
@@ -30,9 +31,10 @@ class Table(Element):
             column_flexes: list[float] | None = None,
             cell_renderer: DrawFunc | None = None,
             draw_attrs: dict[str, Any] | None = None,
-            colours: dict[str, Colour] | None = None
+            colours: dict[str, Colour] | None = None,
+            hover_tooltip: Label | None = None
         ) -> None:
-        super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours)
+        super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours, hover_tooltip=hover_tooltip)
 
         self.cell_inset = cell_inset
         self._set_renderer(cell_renderer)

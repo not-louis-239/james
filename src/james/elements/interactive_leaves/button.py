@@ -43,9 +43,13 @@ class _Button(Element):
             k_border_hovered: str | None = None,
             k_border_pressed: str | None = None,
             border_w: int = 0,
-            hover_label: Label | None = None,
+            hover_tooltip: Label | None = None,
         ) -> None:
-        super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours)
+        super().__init__(
+            flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours,
+            hover_tooltip=hover_tooltip, interactive=True
+        )
+        
         self.text = text
         self.font = font
         self.inset = inset
@@ -66,8 +70,6 @@ class _Button(Element):
         self.k_border_pressed = k_border_pressed if k_border_pressed is not None else k_border_colour
 
         self.border_w = border_w
-
-        self.hover_label = hover_label
 
     def _get_text_size_with_inset(self) -> tuple[int, int]:
         """Get text size, including inset."""
@@ -100,9 +102,6 @@ class _Button(Element):
 
 
 class RectButton(_Button):
-    def update(self, dt_s: float) -> None:
-        pass  # TODO: implement labels
-
     def preferred_size(self) -> tuple[int, int]:
         return self.fixed_size or self._get_text_size_with_inset()
 
@@ -159,7 +158,8 @@ class CircleButton(_Button):
             k_border_colour: str | None = None,
             k_border_hovered: str | None = None,
             k_border_pressed: str | None = None,
-            border_w: int = 0
+            border_w: int = 0,
+            hover_tooltip: Label | None = None
         ) -> None:
         super().__init__(
             flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours,
@@ -168,7 +168,7 @@ class CircleButton(_Button):
             k_bg_colour=k_bg_colour, k_bg_hovered=k_bg_hovered, k_bg_pressed=k_bg_pressed,
             k_fg_colour=k_fg_colour, k_fg_hovered=k_fg_hovered, k_fg_pressed=k_fg_pressed,
             k_border_colour=k_border_colour, k_border_hovered=k_border_hovered,
-            k_border_pressed=k_border_pressed, border_w=border_w
+            k_border_pressed=k_border_pressed, border_w=border_w, hover_tooltip=hover_tooltip
         )
         self.r = r
 

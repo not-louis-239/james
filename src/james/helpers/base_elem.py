@@ -16,16 +16,15 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 import pygame as pg
 
 from james.helpers import renderer as _renderer
 from james.helpers.custom_types import Colour, DrawFunc, SupportsGetItemColour
 
-
-# TODO: self.visible MUST affect both hit_test and drawing, AND layout
-#  - invisible elements are not laid out
+if TYPE_CHECKING:
+    from james.elements.static_leaves.label import Label
 
 
 class Element(ABC):
@@ -33,7 +32,8 @@ class Element(ABC):
             self, *, flex: float = 0.0, shrink: float = 0.0,
             draw_attrs: dict[str, Any] | None = None,
             colours: dict[str, Colour] | None = None,
-            interactive: bool = False
+            interactive: bool = False,
+            hover_tooltip: Label | None = None,
         ) -> None:
         # The ratios of flex or shrink for different UI components
         # determines how the excess or shortage of space is distributed
@@ -83,6 +83,7 @@ class Element(ABC):
 
         self.draw_attrs = draw_attrs or {}
         self.colours = colours or {}
+        self.hover_tooltip = hover_tooltip
 
     def _set_renderer(self, renderer: DrawFunc | None) -> None:
         chosen = renderer or _renderer.DEFAULT_RENDERER

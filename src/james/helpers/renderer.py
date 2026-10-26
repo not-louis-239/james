@@ -19,5 +19,9 @@ DEFAULT_RENDERER: DrawFunc | None = None
 
 
 def set_default_renderer(renderer: DrawFunc) -> None:
+    """Set the renderer function that will be used
+    in the constructors of `Element`s that render children
+    when no `renderer=` parameter is provided in their constructors."""
+
     global DEFAULT_RENDERER
     DEFAULT_RENDERER = renderer
