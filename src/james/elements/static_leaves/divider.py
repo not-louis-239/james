@@ -49,8 +49,7 @@ class Divider(Element):
         return (0, self.thickness)
 
     def layout(self, rect: pg.Rect) -> None:
-        self.rect = rect
-        self.layout_dirty = False
+        self.assign_rect(rect)
 
     def draw_primitive(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         pg.draw.rect(surface, theme[self.k_fg], self.rect)

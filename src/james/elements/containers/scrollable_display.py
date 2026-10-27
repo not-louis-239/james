@@ -113,8 +113,7 @@ class ScrollableDisplay(Element):
     def layout(self, rect: pg.Rect) -> None:
         # Layout oneself to the rect to which it has been assigned (from a parent)
         # Then calculate the size of `self`'s internal rect and layout children according to it.
-        self.rect = rect
-        self.layout_dirty = False
+        self.assign_rect(rect)
         self.child.layout(pg.Rect(0, 0, *self.child.preferred_size()))
 
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:

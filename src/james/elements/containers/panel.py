@@ -72,8 +72,7 @@ class Panel(Element):
             pg.draw.rect(surface, theme[self.k_border], self.rect, self.border_w)
 
     def layout(self, rect: pg.Rect) -> None:
-        self.rect = rect
-        self.layout_dirty = False
+        self.assign_rect(rect)
 
         if self.child:
             child_rect = rect.inflate(-2 * self.horiz_padding, -2 * self.vert_padding)

@@ -101,8 +101,7 @@ class RectButton(_Button):
         return self.fixed_size or self._get_text_size_with_inset()
 
     def layout(self, rect: pg.Rect) -> None:
-        self.rect = rect
-        self.layout_dirty = False
+        self.assign_rect(rect)
 
     def draw_primitive(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         """Draws a primitive, borderless rectangular button."""
@@ -207,5 +206,4 @@ class CircleButton(_Button):
         return (2 * self.r, 2 * self.r)
 
     def layout(self, rect: pg.Rect) -> None:
-        self.rect = rect
-        self.layout_dirty = False
+        self.assign_rect(rect)

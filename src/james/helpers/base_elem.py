@@ -188,6 +188,11 @@ class Element(ABC):
         # print(f"[id:{id(self)}] No child hit test returned, returning None")
         return None
 
+    def assign_rect(self, rect: pg.Rect) -> None:
+        """Assign `rect` to `self.rect` and set `self.layout_dirty` to False."""
+        self.rect = rect
+        self.layout_dirty = False
+
     @abstractmethod
     def preferred_size(self) -> tuple[int, int]:
         """How big should this UI element be, given no constraints?"""

@@ -100,8 +100,7 @@ class Table(Element):
     def layout(self, rect: pg.Rect) -> None:
         self._validate()
 
-        self.rect = rect
-        self.layout_dirty = False
+        self.assign_rect(rect)
 
         # Measurement pass - find the maximum width and height of each column and row
         preferred_sizes = [

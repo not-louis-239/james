@@ -32,8 +32,7 @@ class Spacer(Element):
         return (self.min_w, self.min_h)
 
     def layout(self, rect: Rect) -> None:
-        self.rect = rect
-        self.layout_dirty = False
+        self.assign_rect(rect)
 
     def draw_default(self, surface: Surface, theme: SupportsGetItemColour) -> None:
         """Draws nothing, as a Spacer is invisible."""

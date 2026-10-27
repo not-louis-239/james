@@ -62,8 +62,7 @@ class Collapsible(Element):
         )
 
     def layout(self, rect: Rect) -> None:
-        self.rect = rect
-        self.layout_dirty = False
+        self.assign_rect(rect)
 
         trigger_w, trigger_h = self.trigger.preferred_size()
 

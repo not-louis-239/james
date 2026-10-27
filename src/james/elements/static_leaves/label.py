@@ -69,8 +69,7 @@ class Label(Element):
             pg.draw.rect(surface, theme[self.k_border], self.rect, width=self.border_w)
 
     def layout(self, rect: pg.Rect) -> None:
-        self.rect = rect
-        self.layout_dirty = False
+        self.assign_rect(rect)
 
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         if not self.visible:

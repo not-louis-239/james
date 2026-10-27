@@ -47,8 +47,7 @@ class Group(Element):
         return (0, 0)
 
     def layout(self, rect: Rect) -> None:
-        self.rect = rect
-        self.layout_dirty = False
+        self.assign_rect(rect)
 
     def draw_default(self, surface: Surface, theme: SupportsGetItemColour) -> None:
         if not self.visible:

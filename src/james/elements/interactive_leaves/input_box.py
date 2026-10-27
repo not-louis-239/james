@@ -605,8 +605,7 @@ class InputBox(Element):
         return (0, self.font.get_height() + 2 * self.inset)
 
     def layout(self, rect) -> None:
-        self.rect = rect
-        self.layout_dirty = False
+        self.assign_rect(rect)
 
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         if not self.visible:

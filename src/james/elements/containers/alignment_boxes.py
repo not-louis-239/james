@@ -85,8 +85,7 @@ class HBox(_Box):
         return (total_w, max_h)
 
     def layout(self, rect: pg.Rect) -> None:
-        self.rect = rect
-        self.layout_dirty = False
+        self.assign_rect(rect)
 
         # Measure preferred sizes
         preferred_widths: dict[Element, float] = {
@@ -154,8 +153,7 @@ class VBox(_Box):
         return max_w, total_h
 
     def layout(self, rect: pg.Rect) -> None:
-        self.rect = rect
-        self.layout_dirty = False
+        self.assign_rect(rect)
 
         # Measure preferred sizes
         preferred_heights: dict[Element, float] = {
@@ -238,8 +236,7 @@ class SBox(_Box):
         return (w, h)
 
     def layout(self, rect: pg.Rect) -> None:
-        self.rect = rect
-        self.layout_dirty = False
+        self.assign_rect(rect)
 
         if self.strict:
             child_rect = pg.Rect(0, 0, *rect.size)
