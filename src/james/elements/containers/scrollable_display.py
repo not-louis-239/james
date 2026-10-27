@@ -29,16 +29,18 @@ class ScrollableDisplay(Element):
     Its height depends on the preferred size of the contents inside of the display."""
     def __init__(
             self, *, flex: float = 0, shrink: float = 0.0,
-            internal_padding: int = 0,
+            padding: int = 0,
             child: Element,
             renderer: DrawFunc | None = None,
             k_bg: str | None = None,
             k_border: str | None = None,
             border_w: int = 0,
-            hover_tooltip: Label | None = None
+            hover_tooltip: Label | None = None,
+            min_internal_w: int = 0,
+            min_internal_h: int = 0
         ) -> None:
         super().__init__(flex=flex, shrink=shrink, interactive=True, hover_tooltip=hover_tooltip)
-        self.internal_padding = internal_padding
+        self.padding = padding
 
         self.child = child
         self.children = [child]
@@ -54,12 +56,22 @@ class ScrollableDisplay(Element):
         self.k_border = k_border
         self.border_w = border_w
 
+        self.min_internal_w = min_internal_w
+        self.min_internal_h = min_internal_h
+
+    def _calc_internal_rect(self) -> pg.Rect:
+        child_preferred_w, child_preferred_h = self.child.preferred_size()
+        w, h = max(self.min_internal_w, child_preferred_w), max(self.min_internal_h, child_preferred_h)
+        child_rect = pg.Rect(0, 0, w, h)
+
+        return child_rect
+
     def _refresh_internal_surface(self, theme: SupportsGetItemColour) -> None:
         """Redraws `self`'s internal surface. Could be expensive depending
         on what is inside `self`. """
 
         # Resize the surface if needed
-        if (required_size := self.child.preferred_size()) != self.internal_surface.get_size():
+        if (required_size := self._calc_internal_rect().size) != self.internal_surface.get_size():
             self.internal_surface = pg.Surface(required_size, pg.SRCALPHA)
 
         # Then redraw the content
@@ -71,18 +83,30 @@ class ScrollableDisplay(Element):
         s_x, s_y = self.physics.disp
         return int(dx + s_x), int(dy + s_y)
 
-    def get_displayable_rect(self) -> pg.Rect:
-        return pg.Rect(self.physics.disp.x, self.physics.disp.y, self.rect.width - 2 * self.internal_padding, self.rect.height - 2 * self.internal_padding)
+    def _get_displayable_rect(self) -> pg.Rect:
+        return pg.Rect(
+            self.physics.disp.x,
+            self.physics.disp.y,
+            self.rect.width - 2 * self.padding,
+            self.rect.height - 2 * self.padding
+        )
 
     def blit_relevant_surf(self, dest_surface: pg.Surface) -> None:
         """Blits the relevant portion of `self.internal_surface` to `dest_surface`."""
-        displayable_rect = self.get_displayable_rect()
-        dest_surface.blit(self.internal_surface, (self.rect.x + self.internal_padding, self.rect.y + self.internal_padding), area=displayable_rect)
+        displayable_rect = self._get_displayable_rect()
+        dest_surface.blit(
+            self.internal_surface, (
+                self.rect.x + self.padding,
+                self.rect.y + self.padding
+            ), area=displayable_rect
+        )
 
     def update(self, dt_s: float) -> None:
         child_max_x, child_max_y = self.child.preferred_size()
-        self.physics.disp_botright.x = max(0, child_max_x + 2 * self.internal_padding - self.rect.width)
-        self.physics.disp_botright.y = max(0, child_max_y + 2 * self.internal_padding - self.rect.height)
+        self.physics.disp_topleft.x = -self.padding
+        self.physics.disp_topleft.y = -self.padding
+        self.physics.disp_botright.x = max(0, child_max_x + self.padding - self.rect.width)
+        self.physics.disp_botright.y = max(0, child_max_y + self.padding - self.rect.height)
         self.physics.update(dt_s=dt_s)
 
     def handle_scroll(self, event: pg.event.Event) -> None:
@@ -108,13 +132,20 @@ class ScrollableDisplay(Element):
 
     def preferred_size(self) -> tuple[int, int]:
         cw, ch = self.child.preferred_size()
-        return cw + 2 * self.internal_padding, ch + 2 * self.internal_padding
+        return cw + 2 * self.padding, ch + 2 * self.padding
 
     def layout(self, rect: pg.Rect) -> None:
         # Layout oneself to the rect to which it has been assigned (from a parent)
         # Then calculate the size of `self`'s internal rect and layout children according to it.
         self.assign_rect(rect)
-        self.child.layout(pg.Rect(0, 0, *self.child.preferred_size()))
+        print(f"Assigned rect: {self.rect}")
+
+        # Enforce minimum size constraints so that the child doesn't collapse in on themself.
+        child_rect = self._calc_internal_rect()
+        print(f"Assigning child rect: {child_rect}")
+
+        # Layout
+        self.child.layout(child_rect)
 
     def draw_default(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         if not self.visible:
