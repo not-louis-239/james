@@ -112,8 +112,34 @@ class Element(ABC):
             self.shrink = self.shrink + child.shrink
 
         # Layout shouldn't be trusted
-        if not self.layout_dirty:
+        self.invalidate_layout()
+
+    def rm_child(self, child: Element) -> bool:
+        """Attempt to remove a child from the group and return
+        whether the child was removed."""
+        if child in self.children:
+            self.children.remove(child)
+            child.parent = None
+
+            if self._fixed_shrink is None:
+                self.shrink = self.shrink - child.shrink
+
             self.invalidate_layout()
+            return True
+
+        return False
+
+    def clear_children(self) -> None:
+        """Remove all children from the group."""
+        for child in self.children:
+            child.parent = None
+
+        self.children.clear()
+
+        if self._fixed_shrink is None:
+            self.shrink = 0
+
+        self.invalidate_layout()
 
     @property
     def parents(self) -> list[Element]:

@@ -38,10 +38,6 @@ class Group(Element):
     def __iter__(self) -> Iterator[Element]:
         yield from self.children
 
-    def clear_children(self) -> None:
-        """Remove all children from the group."""
-        self.children.clear()
-
     def preferred_size(self) -> tuple[int, int]:
         """A group without spatially connected elements has no intrinsic size."""
         return (0, 0)
