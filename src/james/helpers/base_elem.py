@@ -103,8 +103,15 @@ class Element(ABC):
         if self.parent is not None:
             self.parent.invalidate_layout()
 
-    def add_child(self, child: Element) -> None:
-        self.children.append(child)
+    def add_child(self, child: Element, index: int | None = None) -> None:
+        """Add a `child` to `self` at a given `index`.  If no index is provided,
+        the child is added to the end of `self`'s children list."""
+
+        if index is not None:
+            self.children.insert(index, child)
+        else:
+            self.children.append(child)
+
         child.parent = self
 
         # Propagate shrink unless an override is set
@@ -114,9 +121,15 @@ class Element(ABC):
         # Layout shouldn't be trusted
         self.invalidate_layout()
 
-    def rm_child(self, child: Element) -> bool:
-        """Attempt to remove a child from the group and return
+    def rm_child(self, child: Element | int) -> bool:
+        """Attempt to remove a child, or index from the group and return
         whether the child was removed."""
+        if isinstance(child, int):
+            if not 0 <= child < len(self.children):
+                return False
+
+            child = self.children[child]
+
         if child in self.children:
             self.children.remove(child)
             child.parent = None
