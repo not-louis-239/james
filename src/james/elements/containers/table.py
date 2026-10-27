@@ -31,11 +31,9 @@ class Table(Element):
             row_flexes: list[float] | None = None,
             column_flexes: list[float] | None = None,
             cell_renderer: DrawFunc | None = None,
-            draw_attrs: dict[str, Any] | None = None,
-            colours: dict[str, Colour] | None = None,
             hover_tooltip: Label | None = None
         ) -> None:
-        super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours, hover_tooltip=hover_tooltip)
+        super().__init__(flex=flex, shrink=shrink, hover_tooltip=hover_tooltip)
 
         self.cell_inset = cell_inset
         self._set_renderer(cell_renderer)

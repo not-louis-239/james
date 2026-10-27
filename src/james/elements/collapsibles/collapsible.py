@@ -28,12 +28,10 @@ class Collapsible(Element):
             flex: float = 0, shrink: float = 0,
             trigger: Element, content: Element,
             gap: int = 0,  # gap between trigger and content when expanded
-            draw_attrs: dict[str, Any] | None = None,
-            colours: dict[str, Colour] | None = None,
             expand_direction: Literal["up", "down", "left", "right"] = "down",
             hover_tooltip: Label | None = None,
         ) -> None:
-        super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours, hover_tooltip=hover_tooltip)
+        super().__init__(flex=flex, shrink=shrink, hover_tooltip=hover_tooltip)
 
         self.trigger = trigger
         self.content = content

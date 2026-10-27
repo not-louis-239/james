@@ -1,6 +1,6 @@
 # James
 
-*Just A Modular Element Structurer*
+*Just A Modular Element Structure*
 
 **Version**: 0.2.5
 

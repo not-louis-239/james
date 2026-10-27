@@ -29,16 +29,11 @@ class Divider(Element):
     def __init__(
             self, *,
             flex: int = 1,
-            draw_attrs: dict[str, Any] | None = None,
-            colours: dict[str, Colour] | None = None,
             orientation: Literal["horiz", "vert"] = "horiz",
             k_fg: str, thickness: int = 2,
             hover_tooltip: Label | None = None,
         ) -> None:
-        super().__init__(
-            flex=flex, draw_attrs=draw_attrs, colours=colours,
-            hover_tooltip=hover_tooltip, interactive=True
-        )
+        super().__init__(flex=flex, hover_tooltip=hover_tooltip, interactive=True)
 
         self.orientation = orientation
         self.k_fg = k_fg

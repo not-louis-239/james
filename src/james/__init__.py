@@ -14,7 +14,7 @@
 
 
 """
-James - 'Just A Modular Element Structurer'
+James - 'Just A Modular Element Structure'
 
 UI library for pygame, designed to be modular and easy to use.
 """

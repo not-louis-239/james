@@ -27,8 +27,6 @@ class Panel(Element):
     def __init__(
             self, child: Element | None = None,
             *, flex: float = 0, shrink: float = 0.0,
-            draw_attrs: dict[str, Any] | None = None,
-            colours: dict[str, Colour] | None = None,
             horiz_padding: int = 0, vert_padding: int | None = None,
             k_bg: str | None = None,
             k_border: str | None = None,
@@ -38,8 +36,7 @@ class Panel(Element):
             hover_tooltip: Label | None = None,
         ) -> None:
         super().__init__(
-            flex=flex, shrink=shrink, draw_attrs=draw_attrs,
-            colours=colours, interactive=True, hover_tooltip=hover_tooltip,
+            flex=flex, shrink=shrink, interactive=True, hover_tooltip=hover_tooltip,
         )
         self.horiz_padding = horiz_padding
         self.vert_padding = vert_padding if vert_padding is not None else horiz_padding

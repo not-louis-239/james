@@ -28,8 +28,6 @@ from james.elements.static_leaves.label import Label
 class _Button(Element):
     def __init__(
             self, *, flex: float = 0, shrink: float = 0.0,
-            draw_attrs: dict[str, Any] | None = None,
-            colours: dict[str, Colour] | None = None,
             text: str = "", font: pg.font.Font, inset: int = 0,
             fixed_size: tuple[int, int] | None = None, img_path: Path | None = None,
             img_inset: int = 0,
@@ -45,11 +43,8 @@ class _Button(Element):
             border_w: int = 0,
             hover_tooltip: Label | None = None,
         ) -> None:
-        super().__init__(
-            flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours,
-            hover_tooltip=hover_tooltip, interactive=True
-        )
-        
+        super().__init__(flex=flex, shrink=shrink, hover_tooltip=hover_tooltip, interactive=True)
+
         self.text = text
         self.font = font
         self.inset = inset
@@ -144,8 +139,6 @@ class RectButton(_Button):
 class CircleButton(_Button):
     def __init__(
             self, *, r: int, flex: float = 0, shrink: float = 0.0,
-            draw_attrs: dict[str, Any] | None = None,
-            colours: dict[str, Colour] | None = None,
             text: str = "", font: pg.font.Font, inset: int = 0,
             fixed_size: tuple[int, int] | None = None, img_path: Path | None = None,
             img_inset: int = 0,
@@ -162,9 +155,8 @@ class CircleButton(_Button):
             hover_tooltip: Label | None = None
         ) -> None:
         super().__init__(
-            flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours,
-            text=text, font=font, inset=inset, fixed_size=fixed_size, img_path=img_path,
-            img_inset=img_inset,
+            flex=flex, shrink=shrink, text=text, font=font, inset=inset,
+            fixed_size=fixed_size, img_path=img_path, img_inset=img_inset,
             k_bg_colour=k_bg_colour, k_bg_hovered=k_bg_hovered, k_bg_pressed=k_bg_pressed,
             k_fg_colour=k_fg_colour, k_fg_hovered=k_fg_hovered, k_fg_pressed=k_fg_pressed,
             k_border_colour=k_border_colour, k_border_hovered=k_border_hovered,

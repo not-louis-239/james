@@ -29,8 +29,6 @@ class ScrollableDisplay(Element):
     Its height depends on the preferred size of the contents inside of the display."""
     def __init__(
             self, *, flex: float = 0, shrink: float = 0.0,
-            draw_attrs: dict[str, Any] | None = None,
-            colours: dict[str, Colour] | None = None,
             internal_padding: int = 0,
             child: Element,
             renderer: DrawFunc | None = None,
@@ -39,7 +37,7 @@ class ScrollableDisplay(Element):
             border_w: int = 0,
             hover_tooltip: Label | None = None
         ) -> None:
-        super().__init__(flex=flex, shrink=shrink, draw_attrs=draw_attrs, colours=colours, interactive=True, hover_tooltip=hover_tooltip)
+        super().__init__(flex=flex, shrink=shrink, interactive=True, hover_tooltip=hover_tooltip)
         self.internal_padding = internal_padding
 
         self.child = child

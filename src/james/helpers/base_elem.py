@@ -31,8 +31,6 @@ if TYPE_CHECKING:
 class Element(ABC):
     def __init__(
             self, *, flex: float = 0.0, shrink: float = 0.0,
-            draw_attrs: dict[str, Any] | None = None,
-            colours: dict[str, Colour] | None = None,
             interactive: bool = False,
             hover_tooltip: Label | None = None,
         ) -> None:
@@ -64,27 +62,13 @@ class Element(ABC):
         # `self` should take it.
         self.interactive = interactive
 
-        # These dicts are to allow implementation of custom draw functions
-        # and attaching custom attributes for drawing and colouring
-        # I would recommend attaching these to your objects using a
-        # StrEnum for the different attrs you want to have.
-        # Only needed if there is an attribute that you need that isn't already
-        # supplied.
-
-        # Like:
-        # (
-        #     # ... the rest of your instantiated element's constructor...
-        #     draw_attrs={DrawAttr.BORDER_W: 3},
-        #     colours={ColourAttr.BORDER: ThemeKey.BORDER}
-        # )
-
-        # Other attributes that may be present in inherited classes
-        # are of the form `self.k_*` - these are colour keys,
-        # intended for use with a theme-type object.
-
-        self.draw_attrs = draw_attrs or {}
-        self.colours = colours or {}
         self.hover_tooltip = hover_tooltip
+
+        # Classes inheriting from `Element` should define their own
+        # specialised drawing state rather than storing arbitrary renderer
+        # attributes on the base Element.
+        # Custom renderers receive the concrete Element or inherited instance,
+        # so they can access any attributes defined by that element directly.
 
     def draw_hitbox(self, surface: pg.Surface) -> None:
         """Draw the hitbox of the UI element."""

@@ -26,12 +26,10 @@ class Group(Element):
     def __init__(
             self, *children: Element,
             flex: float = 1.0,
-            draw_attrs: dict[str, Any] | None = None,
-            colours: dict[str, Colour] | None = None,
             hover_tooltip: Label | None = None,
         ) -> None:
         """Create a group of elements that aren't necessarily connected."""
-        super().__init__(flex=flex, draw_attrs=draw_attrs, colours=colours, hover_tooltip=hover_tooltip)
+        super().__init__(flex=flex, hover_tooltip=hover_tooltip)
         self.children = list(children)  # type: ignore
 
     def __getitem__(self, index: int) -> Element:

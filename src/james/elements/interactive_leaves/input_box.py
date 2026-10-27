@@ -45,8 +45,6 @@ class InputBox(Element):
 
     def __init__(
             self, *, flex: float = 0, shrink: float = 0.0,
-            draw_attrs: dict[str, Any] | None = None,
-            colours: dict[str, Colour] | None = None,
             font: pg.font.Font,
             inset: int = 0,
             sentinel_text: str = "",
@@ -74,8 +72,7 @@ class InputBox(Element):
             hover_tooltip: Label | None = None,
         ) -> None:
         super().__init__(
-            flex=flex, shrink=shrink, draw_attrs=draw_attrs,
-            colours=colours, hover_tooltip=hover_tooltip, interactive=True
+            flex=flex, shrink=shrink, hover_tooltip=hover_tooltip, interactive=True
         )
 
         self.text: str = ""
