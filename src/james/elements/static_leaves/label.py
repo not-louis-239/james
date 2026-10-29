@@ -15,12 +15,10 @@
 
 from __future__ import annotations
 
-from typing import Any
-
 import pygame as pg
 
 from james.helpers.base_elem import Element
-from james.helpers.custom_types import Colour, SupportsGetItemColour
+from james.helpers.custom_types import SupportsGetItemColour
 from james.helpers.utils import crop_text_to_fit, get_text_surf
 
 

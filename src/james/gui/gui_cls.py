@@ -15,10 +15,10 @@
 
 import pygame as pg
 
-from james._internals.constants import HOVER_TOOLTIP_MARGIN, DUMMY_SURFACE
+from james._internals.constants import DUMMY_SURFACE, HOVER_TOOLTIP_MARGIN
+from james.helpers import renderer as _renderer
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import DrawFunc, SupportsGetItemColour
-from james.helpers import renderer as _renderer
 
 
 def _propagate_update(elem: Element, dt_s: float) -> None:

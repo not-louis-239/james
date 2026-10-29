@@ -16,13 +16,13 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 import pygame as pg
 
 from james._internals.constants import HITBOX_COLOUR_0, HITBOX_W
 from james.helpers import renderer as _renderer
-from james.helpers.custom_types import Colour, DrawFunc, SupportsGetItemColour
+from james.helpers.custom_types import DrawFunc, SupportsGetItemColour
 
 if TYPE_CHECKING:
     from james.elements.static_leaves.label import Label
@@ -86,7 +86,6 @@ class Element[K](ABC):
 
     def update(self, dt_s: float) -> None:
         """Note: only updates `self`, not its children."""
-        pass
 
     def invalidate_layout(self) -> None:
         """Invalidate the layout of the element, and propagate it upwards."""

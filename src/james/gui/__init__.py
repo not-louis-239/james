@@ -15,5 +15,4 @@
 
 from james.gui import gui_cls
 
-
 GUI = gui_cls.GUI

@@ -13,13 +13,12 @@
 # limitations under the License.
 
 
-from typing import Any
 
 import pygame as pg
 
-from james.helpers.base_elem import Element
-from james.helpers.custom_types import Colour, DrawFunc, SupportsGetItemColour
 from james.elements.static_leaves.label import Label
+from james.helpers.base_elem import Element
+from james.helpers.custom_types import DrawFunc, SupportsGetItemColour
 
 
 class Panel[K](Element[K]):

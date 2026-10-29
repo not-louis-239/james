@@ -13,15 +13,14 @@
 # limitations under the License.
 
 
-from typing import Any
 
 import pygame as pg
 
 from james._internals.constants import DUMMY_SURFACE
-from james.helpers.base_elem import Element
-from james.helpers.custom_types import Colour, DrawFunc, SupportsGetItemColour
-from james.helpers.scroll_physics import ScrollPhysics
 from james.elements.static_leaves.label import Label
+from james.helpers.base_elem import Element
+from james.helpers.custom_types import DrawFunc, SupportsGetItemColour
+from james.helpers.scroll_physics import ScrollPhysics
 
 
 class ScrollableDisplay[K](Element[K]):

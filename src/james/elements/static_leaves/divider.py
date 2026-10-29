@@ -13,13 +13,13 @@
 # limitations under the License.
 
 
-from typing import Any, Literal
+from typing import Literal
 
 import pygame as pg
 
-from james.helpers.base_elem import Element
-from james.helpers.custom_types import Colour, SupportsGetItemColour
 from james.elements.static_leaves.label import Label
+from james.helpers.base_elem import Element
+from james.helpers.custom_types import SupportsGetItemColour
 
 
 class Divider[K](Element[K]):

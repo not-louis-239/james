@@ -13,15 +13,19 @@
 # limitations under the License.
 
 
-from typing import Any
 
 import pygame as pg
 
-from james._internals.constants import HITBOX_COLOUR_0, HITBOX_COLOUR_1, HITBOX_COLOUR_2, HITBOX_W
+from james._internals.constants import (
+    HITBOX_COLOUR_0,
+    HITBOX_COLOUR_1,
+    HITBOX_COLOUR_2,
+    HITBOX_W,
+)
 from james.elements.containers.alignment_boxes import HBox
-from james.helpers.base_elem import Element
-from james.helpers.custom_types import Colour, DrawFunc, SupportsGetItemColour
 from james.elements.static_leaves.label import Label
+from james.helpers.base_elem import Element
+from james.helpers.custom_types import DrawFunc, SupportsGetItemColour
 
 
 class Table[K](Element[K]):

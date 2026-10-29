@@ -17,9 +17,9 @@ from enum import StrEnum
 
 import pygame as pg
 
+from james.elements.static_leaves.label import Label
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import DrawFunc, SupportsGetItemColour
-from james.elements.static_leaves.label import Label
 
 
 class HAlign(StrEnum):

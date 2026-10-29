@@ -14,15 +14,14 @@
 
 
 from pathlib import Path
-from typing import Any
 
 import pygame as pg
 
 from james._internals.img_cache import img_cache
-from james.helpers.base_elem import Element
-from james.helpers.custom_types import Colour, SupportsGetItemColour
-from james.helpers.utils import get_text_surf, resize_to_fit
 from james.elements.static_leaves.label import Label
+from james.helpers.base_elem import Element
+from james.helpers.custom_types import SupportsGetItemColour
+from james.helpers.utils import get_text_surf, resize_to_fit
 
 
 class _Button[K](Element[K]):
