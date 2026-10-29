@@ -33,7 +33,7 @@ class ScrollPhysics:
 
     def handle_scroll(self, event: pg.event.Event) -> None:
         if event.type == pg.MOUSEWHEEL:
-            self.vel -= pg.Vector2(event.x, event.y) * self.SCROLL_STRENGTH_COEFF
+            self.vel -= pg.Vector2(-event.x, event.y) * self.SCROLL_STRENGTH_COEFF
 
     def update(self, dt_s: float) -> None:
         self.disp += self.vel * dt_s
