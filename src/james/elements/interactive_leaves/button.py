@@ -25,7 +25,7 @@ from james.helpers.utils import get_text_surf, resize_to_fit
 from james.elements.static_leaves.label import Label
 
 
-class _Button(Element):
+class _Button[K](Element[K]):
     def __init__(
             self, *, flex: float = 0, shrink: float = 0.0,
             text: str = "", font: pg.font.Font, inset: int = 0,
@@ -96,7 +96,7 @@ class _Button(Element):
         )
 
 
-class RectButton(_Button):
+class RectButton[K](_Button):
     def preferred_size(self) -> tuple[int, int]:
         return self.fixed_size or self._get_text_size_with_inset()
 
@@ -111,7 +111,7 @@ class RectButton(_Button):
             pg.draw.rect(surface, theme[self.k_bg], self.rect)
 
         # Draw icon
-        if self.img_path is not None:
+        if self.img_path is not None and self.k_fg is not None:
             img_w = max(0, self.rect.width - 2 * self.img_inset)
             img_h = max(0, self.rect.height - 2 * self.img_inset)
             img_dims = resize_to_fit((img_cache.get_base_cache(self.img_path).get_size()), (img_w, img_h))
@@ -119,8 +119,9 @@ class RectButton(_Button):
             surface.blit(img_surf, img_surf.get_rect(center=self.rect.center))
 
         # Draw text
-        text_surface = get_text_surf(self.font, self.text, theme[self.k_fg])
-        surface.blit(text_surface, text_surface.get_rect(center=self.rect.center))
+        if self.k_fg is not None:
+            text_surface = get_text_surf(self.font, self.text, theme[self.k_fg])
+            surface.blit(text_surface, text_surface.get_rect(center=self.rect.center))
 
     def draw_default_border(self, surface: pg.Surface, theme: SupportsGetItemColour) -> None:
         """Draws a default border style using `self.border_w` and `self.k_border_colour` if set."""
@@ -135,7 +136,7 @@ class RectButton(_Button):
         self.draw_default_border(surface, theme)
 
 
-class CircleButton(_Button):
+class CircleButton[K](_Button):
     def __init__(
             self, *, r: int, flex: float = 0, shrink: float = 0.0,
             text: str = "", font: pg.font.Font, inset: int = 0,
@@ -176,7 +177,7 @@ class CircleButton(_Button):
             pg.draw.circle(surface, theme[self.k_bg], self.rect.center, self.r)
 
         # Draw icon, but bound to the button circle
-        if self.img_path is not None:
+        if self.img_path is not None and self.k_fg is not None:
             img_w = max(0, self.rect.width - 2 * self.img_inset)
             img_h = max(0, self.rect.height - 2 * self.img_inset)
             img_surf = img_cache.get_tinted_scaled_img(
@@ -186,7 +187,7 @@ class CircleButton(_Button):
             surface.blit(img_surf, img_surf.get_rect(center=self.rect.center))
 
         # Draw the text
-        if self.text:
+        if self.text and self.k_fg is not None:
             text_surf = get_text_surf(self.font, self.text, theme[self.k_fg])
             surface.blit(text_surf, text_surf.get_rect(center=self.rect.center))
 

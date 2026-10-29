@@ -143,7 +143,15 @@ def resize_to_fit(dims: tuple[float, float], bounding_box: tuple[float, float]) 
 @lru_cache(maxsize=1024)
 def get_text_surf(font: pg.font.Font, text: str, colour: Colour):
     """Just a wrapper around pg.font.Font().render() with caching.
-    Perhaps this will be helpful and improve performance slightly."""
+    Perhaps this will be helpful and improve performance slightly.
+
+    Since @lru_cache seems to obscure type information,
+    the parameters are, in this order:
+        - font: pg.font.Font
+        - text: str
+        - colour: Colour
+    where Colour = tuple[int, int, int] | tuple[int, int, int, int]"""
+
     return font.render(text, True, colour)
 
 

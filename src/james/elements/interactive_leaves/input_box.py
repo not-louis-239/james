@@ -34,7 +34,7 @@ class _EditState:
     selection_anchor: int | None
 
 
-class InputBox(Element):
+class InputBox[K](Element[K]):
     """An InputBox with an optional attached tooltip. The attached tooltip
     differs from the hover tooltip in that it appears as if it is attached
     under the InputBox instead of appearing when the mouse hovers over the

@@ -39,6 +39,7 @@ SupportsGetItemColour = custom_types.SupportsGetItemColour
 HAlign = alignment_boxes.HAlign
 VAlign = alignment_boxes.VAlign
 AmbientMessage = utils.AmbientMessage
+get_text_surf = utils.get_text_surf
 
 # Containers
 HBox = alignment_boxes.HBox

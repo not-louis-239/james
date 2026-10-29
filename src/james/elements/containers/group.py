@@ -22,7 +22,7 @@ from james.helpers.custom_types import Colour, SupportsGetItemColour
 from james.elements.static_leaves.label import Label
 
 
-class Group(Element):
+class Group[K](Element[K]):
     def __init__(
             self, *children: Element,
             flex: float = 1.0,

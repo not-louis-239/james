@@ -22,7 +22,7 @@ from james.helpers.custom_types import Colour, DrawFunc, SupportsGetItemColour
 from james.elements.static_leaves.label import Label
 
 
-class Panel(Element):
+class Panel[K](Element[K]):
     """A simple panel that can contain one child with padding."""
     def __init__(
             self, child: Element | None = None,

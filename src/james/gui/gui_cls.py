@@ -29,7 +29,7 @@ def _propagate_update(elem: Element, dt_s: float) -> None:
 
 class GUI:
     def __init__(
-            self, *layers: Element, renderer: DrawFunc | None,
+            self, *layers: Element, renderer: DrawFunc | None = None,
             hover_tooltip_margin: int = HOVER_TOOLTIP_MARGIN
         ):
         """Each layer in `layers` is treated as its own separate root element."""
@@ -50,16 +50,7 @@ class GUI:
         self.work_surface.fill((0, 0, 0, 0))
 
     def _set_renderer(self, renderer: DrawFunc | None) -> None:
-        chosen = renderer or _renderer.DEFAULT_RENDERER
-        if chosen is None:
-            raise RuntimeError(
-                f"No renderer set for {type(self).__name__}. "
-                "Use set_default_renderer() to set one "
-                "or provide renderer= with a valid "
-                "draw function in the constructor."
-            )
-
-        self.renderer = chosen
+        self.renderer = renderer or _renderer.DEFAULT_RENDERER
 
     def hit_test(self, pos: tuple[int, int]) -> Element | None:
         """Returns the element under the given position,

@@ -24,7 +24,7 @@ from james.helpers.scroll_physics import ScrollPhysics
 from james.elements.static_leaves.label import Label
 
 
-class ScrollableDisplay(Element):
+class ScrollableDisplay[K](Element[K]):
     """Creates a display that is vertically scrollable.
     Its height depends on the preferred size of the contents inside of the display."""
     def __init__(
@@ -138,11 +138,9 @@ class ScrollableDisplay(Element):
         # Layout oneself to the rect to which it has been assigned (from a parent)
         # Then calculate the size of `self`'s internal rect and layout children according to it.
         self.assign_rect(rect)
-        print(f"Assigned rect: {self.rect}")
 
         # Enforce minimum size constraints so that the child doesn't collapse in on themself.
         child_rect = self._calc_internal_rect()
-        print(f"Assigning child rect: {child_rect}")
 
         # Layout
         self.child.layout(child_rect)

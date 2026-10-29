@@ -22,7 +22,7 @@ from james.helpers.custom_types import Colour, SupportsGetItemColour
 from james.elements.static_leaves.label import Label
 
 
-class Divider(Element):
+class Divider[K](Element[K]):
     """A dividing line that can be used to visually separate
     sections of a UI."""
 

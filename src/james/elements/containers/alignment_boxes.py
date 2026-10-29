@@ -33,7 +33,7 @@ class VAlign(StrEnum):
     BOTTOM = "bottom"
 
 
-class _Box(Element):
+class _Box[K](Element[K]):
     """Generic base class to store attributes common to both `HBox`es and `VBox`es"""
 
     def __init__(
@@ -66,7 +66,7 @@ class _Box(Element):
         for child in self.children:
             self.renderer(surface, child, theme)
 
-class HBox(_Box):
+class HBox[K](_Box[K]):
     """Horizontal box"""
 
     def preferred_size(self) -> tuple[int, int]:
@@ -134,7 +134,7 @@ class HBox(_Box):
             child.layout(child_rect)
             x += w + self.gap
 
-class VBox(_Box):
+class VBox[K](_Box[K]):
     """Vertical box"""
 
     def preferred_size(self) -> tuple[int, int]:
@@ -202,7 +202,7 @@ class VBox(_Box):
             child.layout(child_rect)
             y += h + self.gap
 
-class SBox(_Box):
+class SBox[K](_Box[K]):
     """Sized box that gives its child a fixed-size slot, with alignment.
     Without `strict`, `SBox` will only constrain an element.
     With `strict`, `SBox` ignores the child's preferred size entirely."""

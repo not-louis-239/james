@@ -24,7 +24,7 @@ from james.helpers.custom_types import Colour, DrawFunc, SupportsGetItemColour
 from james.elements.static_leaves.label import Label
 
 
-class Table(Element):
+class Table[K](Element[K]):
     def __init__(
             self, *rows: HBox, flex: float = 0, shrink: float = 0.0,
             cell_inset: int = 0,

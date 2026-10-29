@@ -15,7 +15,14 @@
 
 from james.helpers.custom_types import DrawFunc
 
-DEFAULT_RENDERER: DrawFunc | None = None
+
+def default_renderer(surface, element, theme) -> None:
+    """This is the default renderer that James will use if the user does
+    not set one. It calls the `draw_default` method on the given element."""
+    element.draw_default(surface, theme)
+
+
+DEFAULT_RENDERER: DrawFunc = default_renderer
 
 
 def set_default_renderer(renderer: DrawFunc) -> None:

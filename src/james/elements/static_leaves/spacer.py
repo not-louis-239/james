@@ -19,7 +19,7 @@ from james.helpers.base_elem import Element
 from james.helpers.custom_types import SupportsGetItemColour
 
 
-class Spacer(Element):
+class Spacer[K](Element[K]):
     def __init__(self, *, flex: float = 1.0, min_w: int = 0, min_h: int = 0) -> None:
         super().__init__(flex=flex)
         self.min_w = min_w

@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from james.elements.static_leaves.label import Label
 
 
-class Element(ABC):
+class Element[K](ABC):
     def __init__(
             self, *, flex: float = 0.0, shrink: float = 0.0,
             interactive: bool = False,
@@ -75,16 +75,7 @@ class Element(ABC):
         pg.draw.rect(surface, HITBOX_COLOUR_0, self.rect, HITBOX_W)
 
     def _set_renderer(self, renderer: DrawFunc | None) -> None:
-        chosen = renderer or _renderer.DEFAULT_RENDERER
-        if chosen is None:
-            raise RuntimeError(
-                f"No renderer set for {type(self).__name__}. "
-                "Use set_default_renderer() to set one "
-                "or provide renderer= with a valid "
-                "draw function in the constructor."
-            )
-
-        self.renderer = chosen
+        self.renderer = renderer or _renderer.DEFAULT_RENDERER
 
     def _set_visibility(self, val: bool) -> None:
         """Set the visibility of the UI element and all of its children, if any."""

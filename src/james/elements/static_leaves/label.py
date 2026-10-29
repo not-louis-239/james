@@ -24,7 +24,7 @@ from james.helpers.custom_types import Colour, SupportsGetItemColour
 from james.helpers.utils import crop_text_to_fit, get_text_surf
 
 
-class Label(Element):
+class Label[K](Element[K]):
     def __init__(
             self, *, flex: float = 0, shrink: float = 0.0,
             text: str = "", font: pg.font.Font, inset: int = 0,

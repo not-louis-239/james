@@ -14,7 +14,7 @@
 
 
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any, Protocol
+from typing import TYPE_CHECKING, Protocol
 
 from pygame import Surface
 
@@ -27,6 +27,7 @@ type DrawFunc = Callable[[Surface, Element, SupportsGetItemColour], None]
 type IntCoord2 = tuple[int, int]  # e.g. (width, height)
 
 
-# something that can be indexed like obj[str] to return a Colour
-class SupportsGetItemColour(Protocol):
-    def __getitem__(self, key: Any) -> Colour: ...
+# For theming, James supports any object `obj`
+# that can be indexed like `obj[str]` to return a `Colour`.
+class SupportsGetItemColour[K](Protocol):
+    def __getitem__(self, key: K, /) -> Colour: ...
