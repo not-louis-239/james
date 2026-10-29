@@ -28,7 +28,7 @@ class Label[K](Element[K]):
     def __init__(
             self, *, flex: float = 0, shrink: float = 0.0,
             text: str = "", font: pg.font.Font, inset: int = 0,
-            k_fg: str, k_bg: str | None = None, k_border: str | None = None,
+            k_fg: K, k_bg: K | None = None, k_border: K | None = None,
             border_w: int = 0,
             hover_tooltip: Label | None = None
         ) -> None:

@@ -31,15 +31,15 @@ class _Button[K](Element[K]):
             text: str = "", font: pg.font.Font, inset: int = 0,
             fixed_size: tuple[int, int] | None = None, img_path: Path | None = None,
             img_inset: int = 0,
-            k_bg_colour: str | None = None,
-            k_bg_hovered: str | None = None,
-            k_bg_pressed: str | None = None,
-            k_fg_colour: str,
-            k_fg_hovered: str | None = None,
-            k_fg_pressed: str | None = None,
-            k_border_colour: str | None = None,
-            k_border_hovered: str | None = None,
-            k_border_pressed: str | None = None,
+            k_bg_colour: K | None = None,
+            k_bg_hovered: K | None = None,
+            k_bg_pressed: K | None = None,
+            k_fg_colour: K,
+            k_fg_hovered: K | None = None,
+            k_fg_pressed: K | None = None,
+            k_border_colour: K | None = None,
+            k_border_hovered: K | None = None,
+            k_border_pressed: K | None = None,
             border_w: int = 0,
             hover_tooltip: Label | None = None,
         ) -> None:
@@ -72,7 +72,7 @@ class _Button[K](Element[K]):
         return text_size[0] + self.inset * 2, text_size[1] + self.inset * 2
 
     @property
-    def k_bg(self) -> str | None:
+    def k_bg(self) -> K | None:
         return (
             self.k_bg_pressed if self.pressed
             else self.k_bg_hovered if self.hovered
@@ -80,7 +80,7 @@ class _Button[K](Element[K]):
         )
 
     @property
-    def k_fg(self) -> str | None:
+    def k_fg(self) -> K | None:
         return (
             self.k_fg_pressed if self.pressed
             else self.k_fg_hovered if self.hovered
@@ -88,7 +88,7 @@ class _Button[K](Element[K]):
         )
 
     @property
-    def k_border(self) -> str | None:
+    def k_border(self) -> K | None:
         return (
             self.k_border_pressed if self.pressed
             else self.k_border_hovered if self.hovered
@@ -142,15 +142,15 @@ class CircleButton[K](_Button):
             text: str = "", font: pg.font.Font, inset: int = 0,
             fixed_size: tuple[int, int] | None = None, img_path: Path | None = None,
             img_inset: int = 0,
-            k_bg_colour: str | None = None,
-            k_bg_hovered: str | None = None,
-            k_bg_pressed: str | None = None,
-            k_fg_colour: str,
-            k_fg_hovered: str | None = None,
-            k_fg_pressed: str | None = None,
-            k_border_colour: str | None = None,
-            k_border_hovered: str | None = None,
-            k_border_pressed: str | None = None,
+            k_bg_colour: K | None = None,
+            k_bg_hovered: K | None = None,
+            k_bg_pressed: K | None = None,
+            k_fg_colour: K,
+            k_fg_hovered: K | None = None,
+            k_fg_pressed: K | None = None,
+            k_border_colour: K | None = None,
+            k_border_hovered: K | None = None,
+            k_border_pressed: K | None = None,
             border_w: int = 0,
             hover_tooltip: Label | None = None
         ) -> None:

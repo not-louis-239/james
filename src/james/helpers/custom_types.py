@@ -28,6 +28,6 @@ type IntCoord2 = tuple[int, int]  # e.g. (width, height)
 
 
 # For theming, James supports any object `obj`
-# that can be indexed like `obj[str]` to return a `Colour`.
+# that can be indexed like `obj[K]` to return a `Colour`.
 class SupportsGetItemColour[K](Protocol):
     def __getitem__(self, key: K, /) -> Colour: ...

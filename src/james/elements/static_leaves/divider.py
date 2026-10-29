@@ -30,7 +30,7 @@ class Divider[K](Element[K]):
             self, *,
             flex: int = 1,
             orientation: Literal["horiz", "vert"] = "horiz",
-            k_fg: str, thickness: int = 2,
+            k_fg: K, thickness: int = 2,
             hover_tooltip: Label | None = None,
         ) -> None:
         super().__init__(flex=flex, hover_tooltip=hover_tooltip, interactive=True)

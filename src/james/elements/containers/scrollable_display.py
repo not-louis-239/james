@@ -28,12 +28,13 @@ class ScrollableDisplay[K](Element[K]):
     """Creates a display that is vertically scrollable.
     Its height depends on the preferred size of the contents inside of the display."""
     def __init__(
-            self, *, flex: float = 0, shrink: float = 0.0,
+            self, child: Element, *,
+            flex: float = 0,
+            shrink: float = 0.0,
             padding: int = 0,
-            child: Element,
             renderer: DrawFunc | None = None,
-            k_bg: str | None = None,
-            k_border: str | None = None,
+            k_bg: K | None = None,
+            k_border: K | None = None,
             border_w: int = 0,
             hover_tooltip: Label | None = None,
             min_internal_w: int = 0,

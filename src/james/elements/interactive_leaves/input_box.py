@@ -52,22 +52,22 @@ class InputBox[K](Element[K]):
             border_w: int = 0,
             tooltip_inset: int | None = None,
             tooltip_font: pg.font.Font | None = None,
-            k_tooltip: str | None = None,
-            k_bg_colour: str | None = None,
-            k_bg_hovered: str | None = None,
-            k_bg_pressed: str | None = None,
-            k_bg_active: str | None = None,
-            k_fg_colour: str,
-            k_fg_hovered: str | None = None,
-            k_fg_pressed: str | None = None,
-            k_fg_active: str | None = None,
-            k_border_colour: str | None = None,
-            k_border_hovered: str | None = None,
-            k_border_pressed: str | None = None,
-            k_border_active: str | None = None,
-            k_cursor: str,
-            k_bg_selection: str | None = None,
-            k_sentinel: str | None = None,
+            k_tooltip: K | None = None,
+            k_bg_colour: K | None = None,
+            k_bg_hovered: K | None = None,
+            k_bg_pressed: K | None = None,
+            k_bg_active: K | None = None,
+            k_fg_colour: K,
+            k_fg_hovered: K | None = None,
+            k_fg_pressed: K | None = None,
+            k_fg_active: K | None = None,
+            k_border_colour: K | None = None,
+            k_border_hovered: K | None = None,
+            k_border_pressed: K | None = None,
+            k_border_active: K | None = None,
+            k_cursor: K,
+            k_bg_selection: K | None = None,
+            k_sentinel: K | None = None,
             text_size_limit: int = 255,
             hover_tooltip: Label | None = None,
         ) -> None:
@@ -120,7 +120,7 @@ class InputBox[K](Element[K]):
         self._redo_stack: list[_EditState] = []
 
     @property
-    def k_bg(self) -> str | None:
+    def k_bg(self) -> K | None:
         return (
             self.k_bg_active if self.active
             else self.k_bg_hovered if self.hovered
@@ -128,7 +128,7 @@ class InputBox[K](Element[K]):
         )
 
     @property
-    def k_fg(self) -> str:
+    def k_fg(self) -> K:
         return (
             self.k_sentinel if not self.text
             else self.k_fg_active if self.active
@@ -137,7 +137,7 @@ class InputBox[K](Element[K]):
         )
 
     @property
-    def k_border(self) -> str | None:
+    def k_border(self) -> K | None:
         return (
             self.k_border_active if self.active
             else self.k_border_hovered if self.hovered
