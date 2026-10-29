@@ -348,19 +348,22 @@ class InputBox[K](Element[K]):
     def clear_tooltip(self) -> None:
         self.set_tooltip(None)
 
-    def on_focus(self, x_pos: int) -> None:
-        """Call this when the mouse goes down while hovering over `self`."""
+    def on_mouse_down(self, event: pg.Event) -> None:
+        """Call this when the mouse goes down. Expects `event.type == pg.MOUSEBUTTONDOWN`."""
 
-        self.active = True
+        hierarchy: list[Element] = [*self.parents[::-1], self]
 
-        self.cursor_pos = self._get_cursor_pos_from_x(x_pos)
-        self.selection_anchor = self.cursor_pos
-        self.mouse_selecting = True
+        local_pos = event.pos
+        for e in hierarchy:
+            local_pos: tuple[int, int] = e.to_local(local_pos)
 
-        self.cursor_flash_time = 0
-
-    def on_unfocus(self) -> None:
-        """Call this when the mouse goes down while not hovering over `self`."""
+        if self._contains_point(local_pos):
+            self.active = True
+            self.cursor_pos = self._get_cursor_pos_from_x(local_pos[0])
+            self.selection_anchor = self.cursor_pos
+            self.mouse_selecting = True
+            self.cursor_flash_time = 0
+            return
 
         self.active = False
         self.mouse_selecting = False

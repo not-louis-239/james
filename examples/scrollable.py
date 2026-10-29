@@ -95,6 +95,18 @@ def main():
         events = pg.event.get()
         elem = gui.hit_test(pg.mouse.get_pos())
 
+        if elem is not None:
+            # And here's how to calculate local coordinates!
+            print(f"Hit a '{type(elem).__name__}'!")
+            print(f"Parents: {' > '.join(f"'{type(e).__name__}'" for e in [*elem.parents[::-1], elem])}")
+            print(f"Screen Pos: {pg.mouse.get_pos()}")
+
+            local_pos = pg.mouse.get_pos()
+            for e in [*elem.parents[::-1], elem]:
+                local_pos = e.to_local(local_pos)
+
+            print(f"Local Pos: {local_pos}")
+
         for event in events:
             if event.type == pg.QUIT:
                 running = False

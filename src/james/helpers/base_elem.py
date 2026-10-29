@@ -179,7 +179,8 @@ class Element[K](ABC):
         return pos
 
     def _contains_point(self, pos: tuple[int, int]) -> bool:
-        """Return whether an `Element` encompasses a point at `pos`.
+        """Return whether an `Element` encompasses a point at `pos`
+        in local coordinates.
         This determines where an `Element` should begin to search its
         children if a click is received at `pos`.
         Default hitbox is assumed to be the element's `rect`."""
@@ -192,29 +193,21 @@ class Element[K](ABC):
         that can receive pointer interaction at `pos`.
         If no such element is found, return `None`."""
 
-        # print(f"[id:{id(self)}] Hit testing element '{type(self).__name__}', rect: {self.rect}")
-
         if not self.visible:
-            # print(f"[id:{id(self)}] Invisible element: returning None")
             return None
 
         if not self._contains_point(pos):
-            # print(f"[id:{id(self)}] Point not contained in element: returning None")
             return None
 
         pos = self.to_local(pos)
-        # print(f"[id:{id(self)}] Point contained in element.")
 
         for child in self.children[::-1]:
-            # print(f"[id:{id(child)}] Checking child '{type(child).__name__}', id: {id(child)}")
             if (hit := child.hit_test(pos)):
-                # print(f"[id:{id(child)}] Child hit test returned '{type(hit).__name__}', id: {id(hit)}")
                 return hit
 
         if self.interactive:
-            # print(f"[id:{id(self)}] Interactive element: returning self")
             return self
-        # print(f"[id:{id(self)}] No child hit test returned, returning None")
+
         return None
 
     def assign_rect(self, rect: pg.Rect) -> None:
