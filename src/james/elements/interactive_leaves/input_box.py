@@ -348,12 +348,36 @@ class InputBox[K](Element[K]):
     def clear_tooltip(self) -> None:
         self.set_tooltip(None)
 
-    # TODO: refactor handle_input to separate it from global input
-    def handle_input(self, keys: pg.key.ScancodeWrapper, events: list[pg.event.Event], dt_s: float) -> bool:
-        """Handles user input and returns True if `self`'s contents were changed."""
+    def on_focus(self, x_pos: int) -> None:
+        """Call this when the mouse goes down while hovering over `self`."""
 
-        if self.disabled:
-            return False
+        self.active = True
+
+        self.cursor_pos = self._get_cursor_pos_from_x(x_pos)
+        self.selection_anchor = self.cursor_pos
+        self.mouse_selecting = True
+
+        self.cursor_flash_time = 0
+
+    def on_unfocus(self) -> None:
+        """Call this when the mouse goes down while not hovering over `self`."""
+
+        self.active = False
+        self.mouse_selecting = False
+        self.selection_anchor = None
+
+    def on_mouse_up(self) -> None:
+        """Call this when the mouse goes up."""
+
+        # Stop selecting
+        self.mouse_selecting = False
+
+        # If cursor and selection are at the same place, cancel selection.
+        if self.cursor_pos == self.selection_anchor:
+            self.selection_anchor = None
+
+    def handle_input(self, events: list[pg.event.Event], dt_s: float) -> bool:
+        """Handles user input and returns True if `self`'s contents were changed."""
 
         mods = pg.key.get_mods()
         old_contents = self.text
@@ -366,28 +390,9 @@ class InputBox[K](Element[K]):
 
         # Handle KEYDOWN events
         for event in events:
-            if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-                if self.rect.collidepoint(event.pos):
-                    self.active = True
-
-                    self.cursor_pos = self._get_cursor_pos_from_x(event.pos[0])
-                    self.selection_anchor = self.cursor_pos
-                    self.mouse_selecting = True
-
-                    self.cursor_flash_time = 0
-                else:
-                    self.active = False
-                    self.mouse_selecting = False
-                    self.selection_anchor = None
-
-            elif event.type == pg.MOUSEMOTION and self.mouse_selecting:
+            if event.type == pg.MOUSEMOTION and self.mouse_selecting:
                 self.cursor_pos = self._get_cursor_pos_from_x(event.pos[0])
                 self.cursor_flash_time = 0
-
-            elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
-                self.mouse_selecting = False
-                if self.cursor_pos == self.selection_anchor:
-                    self.selection_anchor = None
 
             elif event.type == pg.KEYDOWN and self.active:
                 # Select all
