@@ -2,7 +2,7 @@
 
 *Just A Modular Element Structure*
 
-**Version**: 0.3.0
+**Version**: 0.3.1
 
 *James* is a rectless construction GUI library for Pygame that contains various classes for common element types with default draw functions. In essence, James lets you describe what your UI contains without calculating where everything goes.
 
