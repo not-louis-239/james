@@ -6,21 +6,65 @@
 
 *James* is a rectless construction GUI library for Pygame that contains various classes for common element types with default draw functions. In essence, James lets you describe what your UI contains without calculating where everything goes.
 
+For example, consider this example from the examples/ directory:
+
 ```py
 gui = GUI(
     Panel(
         VBox(
-            HealthBar(...),
+            Spacer(),
             HBox(
-                RectButton(...),
-                RectButton(...),
+                Spacer(),
+                Label(
+                    text="Foo Bar",
+                    inset=PADDING,
+                    font=title_font,
+                    k_fg=ThemeKey.FG
+                ),
+                Spacer(),
             ),
-        )
+            Spacer(),
+            HBox(
+                RectButton(
+                    text="Begin",
+                    font=button_font,
+                    inset=PADDING,
+                    k_bg_colour=ThemeKey.BG_BUTTON,
+                    k_bg_hovered=ThemeKey.BG_BUTTON_HOVERED,
+                    k_bg_pressed=ThemeKey.BG_BUTTON_PRESSED,
+                    k_fg_colour=ThemeKey.FG,
+                    flex=1,
+                ),
+                RectButton(
+                    text="Quit",
+                    font=button_font,
+                    inset=PADDING,
+                    k_bg_colour=ThemeKey.BG_BUTTON,
+                    k_bg_hovered=ThemeKey.BG_BUTTON_HOVERED,
+                    k_bg_pressed=ThemeKey.BG_BUTTON_PRESSED,
+                    k_fg_colour=ThemeKey.FG,
+                    flex=1,
+                ),
+                gap=PADDING,
+            ),
+            Spacer(),
+            gap=PADDING,
+        ),
+        horiz_padding=PADDING,
+        vert_padding=PADDING,
     )
 )
-
-gui.layout([window_rect])
 ```
+
+No ugly `pygame.Rect`s in the constructors.
+
+Then simply do:
+
+```py
+gui.layout([pg.Rect(0, 0, window_width, window_height)])
+```
+
+...when you want to resize stuff. No calculating finicky arithmetic when a user wants to make their window bigger.
 
 ## Why James?
 

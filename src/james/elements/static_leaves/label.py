@@ -42,8 +42,10 @@ class Label[K](Element[K]):
         self.border_w = border_w
 
     def set_text(self, text: str) -> None:
+        old_text = self.text
         self.text = text
-        self.invalidate_layout()
+        if self.text != old_text:
+            self.invalidate_layout()
 
     def preferred_size(self) -> tuple[int, int]:
         text_w, text_h = self.font.size(self.text)
