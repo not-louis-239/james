@@ -357,7 +357,7 @@ class InputBox[K](Element[K]):
         for e in hierarchy:
             local_pos: tuple[int, int] = e.to_local(local_pos)
 
-        if self._contains_point(local_pos):
+        if self.contains_point(local_pos):
             self.active = True
             self.cursor_pos = self._get_cursor_pos_from_x(local_pos[0])
             self.selection_anchor = self.cursor_pos

@@ -178,12 +178,16 @@ class Element[K](ABC):
         """Convert a global position to a local position within this element."""
         return pos
 
-    def _contains_point(self, pos: tuple[int, int]) -> bool:
+    def contains_point(self, pos: tuple[int, int]) -> bool:
         """Return whether an `Element` encompasses a point at `pos`
         in local coordinates.
+
         This determines where an `Element` should begin to search its
-        children if a click is received at `pos`.
-        Default hitbox is assumed to be the element's `rect`."""
+        children or accept a click if said click is received at `pos`.
+        Default hitbox is assumed to be the `Element`'s `rect`.
+
+        Override this method to create a custom collider for an
+        inherited class."""
 
         return self.rect.collidepoint(pos)
 
@@ -196,7 +200,7 @@ class Element[K](ABC):
         if not self.visible:
             return None
 
-        if not self._contains_point(pos):
+        if not self.contains_point(pos):
             return None
 
         pos = self.to_local(pos)

@@ -163,7 +163,7 @@ class CircleButton[K](_Button):
         )
         self.r = r
 
-    def _contains_point(self, pos: tuple[int, int]) -> bool:
+    def contains_point(self, pos: tuple[int, int]) -> bool:
         dx = pos[0] - self.rect.centerx
         dy = pos[1] - self.rect.centery
         return (dx * dx) + (dy * dy) <= (self.r * self.r)

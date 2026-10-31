@@ -16,7 +16,7 @@
 """
 James - 'Just A Modular Element Structure'
 
-UI library for pygame, designed to be modular and easy to use.
+UI library for pygame, designed to be modular and easy to use, with NO RECTS in your constructors.
 """
 
 
