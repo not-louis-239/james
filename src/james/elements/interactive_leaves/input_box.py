@@ -36,7 +36,12 @@ class InputBox[K](Element[K]):
     """An InputBox with an optional attached tooltip. The attached tooltip
     differs from the hover tooltip in that it appears as if it is attached
     under the InputBox instead of appearing when the mouse hovers over the
-    InputBox."""
+    InputBox.
+
+    To wire this up to your event system, use the `on_mouse_down`,
+    `on_mouse_up` and `handle_input` methods for mouse-down events,
+    mouse-up events and processing text, insertions, deletions and selection
+    from keyboard events respectively."""
 
     CURSOR_FLASH_INTERVAL = 0.75
     CURSOR_VISUAL_W = 2
@@ -342,6 +347,20 @@ class InputBox[K](Element[K]):
 
         self.cursor_pos = position
 
+    def reset(self) -> None:
+        """Clear all text, selection, cursor stats, undos and redos."""
+        self.text = ""
+
+        self._undo_stack.clear()
+        self._redo_stack.clear()
+
+        self.cursor_pos = 0
+        self.cursor_flash_time = 0
+
+        self.selection_anchor = None
+        self.scroll_offset = 0
+        self.mouse_selecting = False
+
     def set_tooltip(self, msg: str | None = None) -> None:
         self.tooltip_msg = msg
 
@@ -349,7 +368,9 @@ class InputBox[K](Element[K]):
         self.set_tooltip(None)
 
     def on_mouse_down(self, event: pg.Event) -> None:
-        """Call this when the mouse goes down. Expects `event.type == pg.MOUSEBUTTONDOWN`."""
+        """Call this when the mouse goes down. Expects `event.type == pg.MOUSEBUTTONDOWN`.
+        Call this once per InputBox per event. The InputBox will automatically handle
+        whether it should be active and how it should update after the event."""
 
         hierarchy: list[Element] = [*self.parents[::-1], self]
 
@@ -370,7 +391,8 @@ class InputBox[K](Element[K]):
         self.selection_anchor = None
 
     def on_mouse_up(self) -> None:
-        """Call this when the mouse goes up."""
+        """Call this when the mouse goes up, even if the mouse isn't on
+        the InputBox."""
 
         # Stop selecting
         self.mouse_selecting = False
@@ -380,7 +402,8 @@ class InputBox[K](Element[K]):
             self.selection_anchor = None
 
     def handle_input(self, events: list[pg.event.Event], dt_s: float) -> bool:
-        """Handles user input and returns True if `self`'s contents were changed."""
+        """Handles user input (excluding mouse clicks)
+        and returns True if `self`'s contents were changed."""
 
         mods = pg.key.get_mods()
         old_contents = self.text
@@ -521,13 +544,22 @@ class InputBox[K](Element[K]):
         text_left = self.rect.x + self.inset
 
         # Draw selection highlight
-        if self.selection_anchor is not None:
+        if self.selection_anchor is not None and self.k_bg_selection is not None:
             left, right = min(self.selection_anchor, self.cursor_pos), max(self.selection_anchor, self.cursor_pos)
             select_left = text_left + max(0, self.font.size(self.text[:left])[0] - self.scroll_offset)
             select_right = text_left + min(text_max_width, self.font.size(self.text[:right])[0] - self.scroll_offset)
             pg.draw.rect(surface, theme[self.k_bg_selection], (select_left, text_top, select_right - select_left, self.font.get_height()))
 
-        text_surf = self.font.render(self.text, True, theme[self.k_fg])
+        # Draw text if it is present
+        if self.text:
+            text_surf = self.font.render(self.text, True, theme[self.k_fg])
+
+        elif self.k_sentinel is not None and self.sentinel_text:
+            text_surf = self.font.render(self.sentinel_text, True, theme[self.k_sentinel])
+
+        else:
+            return
+
         source_rect = pg.Rect(
             self.scroll_offset,
             0,
