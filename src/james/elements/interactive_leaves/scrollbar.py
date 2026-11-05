@@ -52,9 +52,6 @@ class Scrollbar[K](Element[K]):
         viewport_height = display.rect.height
         content_height = display.internal_surface.get_height()
 
-        print(f"Viewport height: {viewport_height}")
-        print(f"Content height: {content_height}")
-
         if content_height <= viewport_height:
             return 1.0
         return display.rect.height / content_height
@@ -73,7 +70,6 @@ class Scrollbar[K](Element[K]):
         # Draw the groove first
         groove_left_x = centre_x - self.groove_thickness // 2
         pg.draw.rect(surface, theme[self.k_groove], (groove_left_x, self.rect.y, self.groove_thickness, self.rect.h))
-        print(f"Drawn groove @ {(groove_left_x, self.rect.y, self.groove_thickness, self.rect.h)}")
 
         # Draw the scroll bar
         if self.pressed:

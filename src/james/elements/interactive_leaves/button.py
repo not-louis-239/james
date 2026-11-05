@@ -27,7 +27,7 @@ from james.helpers.utils import get_text_surf, resize_to_fit
 class _Button[K](Element[K]):
     def __init__(
             self, *, flex: float = 0, shrink: float = 0.0,
-            text: str = "", font: pg.font.Font, inset: int = 0,
+            text: str = "", font: pg.font.Font | None = None, inset: int = 0,
             fixed_size: tuple[int, int] | None = None, img_path: Path | None = None,
             img_inset: int = 0,
             k_bg_colour: K | None = None,
@@ -67,6 +67,9 @@ class _Button[K](Element[K]):
 
     def _get_text_size_with_inset(self) -> tuple[int, int]:
         """Get text size, including inset."""
+        if not self.font:
+            return (0, 0)
+
         text_size = self.font.size(self.text)
         return text_size[0] + self.inset * 2, text_size[1] + self.inset * 2
 
@@ -118,7 +121,7 @@ class RectButton[K](_Button):
             surface.blit(img_surf, img_surf.get_rect(center=self.rect.center))
 
         # Draw text
-        if self.k_fg is not None:
+        if self.k_fg is not None and self.font is not None:
             text_surface = get_text_surf(self.font, self.text, theme[self.k_fg])
             surface.blit(text_surface, text_surface.get_rect(center=self.rect.center))
 
@@ -138,7 +141,7 @@ class RectButton[K](_Button):
 class CircleButton[K](_Button):
     def __init__(
             self, *, r: int, flex: float = 0, shrink: float = 0.0,
-            text: str = "", font: pg.font.Font, inset: int = 0,
+            text: str = "", font: pg.font.Font | None = None, inset: int = 0,
             fixed_size: tuple[int, int] | None = None, img_path: Path | None = None,
             img_inset: int = 0,
             k_bg_colour: K | None = None,
@@ -186,7 +189,7 @@ class CircleButton[K](_Button):
             surface.blit(img_surf, img_surf.get_rect(center=self.rect.center))
 
         # Draw the text
-        if self.text and self.k_fg is not None:
+        if self.text and self.k_fg is not None and self.font is not None:
             text_surf = get_text_surf(self.font, self.text, theme[self.k_fg])
             surface.blit(text_surf, text_surf.get_rect(center=self.rect.center))
 
