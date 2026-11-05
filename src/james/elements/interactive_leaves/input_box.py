@@ -372,13 +372,19 @@ class InputBox[K](Element[K]):
         Call this once per InputBox per event. The InputBox will automatically handle
         whether it should be active and how it should update after the event."""
 
-        hierarchy: list[Element] = [*self.parents[::-1], self]
+        # See whether the event even hits `self` in the first place.
+        root = self if not self.parents else self.parents[-1]
+        hit = root.hit_test(event.pos)
 
-        local_pos = event.pos
-        for e in hierarchy:
-            local_pos: tuple[int, int] = e.to_local(local_pos)
+        if hit is self:
+            # Get the local position of the mouse in `self`'s coordinate space
+            # so that `self` can react appropriately.
+            hierarchy: list[Element] = [*self.parents[::-1], self]
+            local_pos = event.pos
+            for e in hierarchy:
+                local_pos: tuple[int, int] = e.to_local(local_pos)
 
-        if self.contains_point(local_pos):
+            # Set properties
             self.active = True
             self.cursor_pos = self._get_cursor_pos_from_x(local_pos[0])
             self.selection_anchor = self.cursor_pos
@@ -386,6 +392,7 @@ class InputBox[K](Element[K]):
             self.cursor_flash_time = 0
             return
 
+        # If `self` was not hit, deactivate `self` and stop selecting.
         self.active = False
         self.mouse_selecting = False
         self.selection_anchor = None

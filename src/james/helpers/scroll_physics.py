@@ -26,9 +26,9 @@ class ScrollPhysics:
     EPS = 1e-6
 
     def __init__(self, disp_topleft: tuple[int, int], disp_botright: tuple[int, int]) -> None:
-        self.disp = pg.Vector2(0, 0)
-        self.disp_topleft = pg.Vector2(disp_topleft)
-        self.disp_botright = pg.Vector2(disp_botright)
+        self.disp: pg.Vector2 = pg.Vector2(0, 0)
+        self.disp_topleft: pg.Vector2 = pg.Vector2(disp_topleft)
+        self.disp_botright: pg.Vector2 = pg.Vector2(disp_botright)
         self.vel: pg.Vector2 = pg.Vector2(0, 0)
 
     def handle_scroll(self, event: pg.event.Event) -> None:

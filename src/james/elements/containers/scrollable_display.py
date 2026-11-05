@@ -13,7 +13,6 @@
 # limitations under the License.
 
 
-
 import pygame as pg
 
 from james._internals.constants import DUMMY_SURFACE
@@ -30,7 +29,6 @@ class ScrollableDisplay[K](Element[K]):
             self, child: Element, *,
             flex: float = 0,
             shrink: float = 0.0,
-            padding: int = 0,
             renderer: DrawFunc | None = None,
             k_bg: K | None = None,
             k_border: K | None = None,
@@ -40,7 +38,6 @@ class ScrollableDisplay[K](Element[K]):
             min_internal_h: int = 0
         ) -> None:
         super().__init__(flex=flex, shrink=shrink, interactive=True, hover_tooltip=hover_tooltip)
-        self.padding = padding
 
         self.child = child
         self.children = [child]
@@ -48,7 +45,6 @@ class ScrollableDisplay[K](Element[K]):
             child.parent = self
 
         self.internal_surface = DUMMY_SURFACE
-        self.internal_rect = pg.Rect(0, 0, 0, 0)
         self.physics = ScrollPhysics(disp_topleft=(0, 0), disp_botright=(0, 0))
 
         self._set_renderer(renderer)
@@ -87,8 +83,8 @@ class ScrollableDisplay[K](Element[K]):
         return pg.Rect(
             self.physics.disp.x,
             self.physics.disp.y,
-            self.rect.width - 2 * self.padding,
-            self.rect.height - 2 * self.padding
+            self.rect.width,
+            self.rect.height
         )
 
     def blit_relevant_surf(self, dest_surface: pg.Surface) -> None:
@@ -96,17 +92,15 @@ class ScrollableDisplay[K](Element[K]):
         displayable_rect = self._get_displayable_rect()
         dest_surface.blit(
             self.internal_surface, (
-                self.rect.x + self.padding,
-                self.rect.y + self.padding
+                self.rect.x,
+                self.rect.y
             ), area=displayable_rect
         )
 
     def update(self, dt_s: float) -> None:
         child_max_x, child_max_y = self.child.preferred_size()
-        self.physics.disp_topleft.x = -self.padding
-        self.physics.disp_topleft.y = -self.padding
-        self.physics.disp_botright.x = max(0, child_max_x + self.padding - self.rect.width)
-        self.physics.disp_botright.y = max(0, child_max_y + self.padding - self.rect.height)
+        self.physics.disp_botright.x = max(0, child_max_x - self.rect.width)
+        self.physics.disp_botright.y = max(0, child_max_y - self.rect.height)
         self.physics.update(dt_s=dt_s)
 
     def handle_scroll(self, event: pg.event.Event) -> None:
@@ -131,8 +125,9 @@ class ScrollableDisplay[K](Element[K]):
             pg.draw.rect(surface, theme[self.k_border], self.rect, width=self.border_w)
 
     def preferred_size(self) -> tuple[int, int]:
-        cw, ch = self.child.preferred_size()
-        return cw + 2 * self.padding, ch + 2 * self.padding
+        # A ScrollableDisplay takes on the preferred size of its child
+        # so that it doesn't have to scroll if it doesn't need to.
+        return self.child.preferred_size()
 
     def layout(self, rect: pg.Rect) -> None:
         # Layout oneself to the rect to which it has been assigned (from a parent)

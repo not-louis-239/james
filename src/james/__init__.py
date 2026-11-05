@@ -28,7 +28,7 @@ from james.elements.containers import (
     scrollable_display,
     table,
 )
-from james.elements.interactive_leaves import button, input_box
+from james.elements.interactive_leaves import button, input_box, scrollbar
 from james.elements.static_leaves import divider, label, spacer
 from james.gui import gui_cls
 from james.helpers import base_elem, custom_types, renderer, utils
@@ -60,6 +60,7 @@ Group = group.Group
 RectButton = button.RectButton
 CircleButton = button.CircleButton
 InputBox = input_box.InputBox
+Scrollbar = scrollbar.Scrollbar
 
 # Static elements
 Spacer = spacer.Spacer
