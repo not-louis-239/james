@@ -17,7 +17,6 @@ from enum import StrEnum
 
 import pygame as pg
 
-from james.elements.static_leaves.label import Label
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import DrawFunc, SupportsGetItemColour
 
@@ -39,7 +38,7 @@ class _Box[K](Element[K]):
     def __init__(
             self, *children: Element, flex: float = 0, shrink: float | None = None,
             gap: int = 0, renderer: DrawFunc | None = None,
-            hover_tooltip: Label | None = None,
+            hover_tooltip: Element | None = None,
         ) -> None:
         """Initialises a new box, with an optional `gap` between its children.
         Flex must be provided explicitly for a box to propagate extra space downwards.
@@ -215,7 +214,7 @@ class SBox[K](_Box[K]):
             h_align: HAlign = HAlign.CENTRE,
             v_align: VAlign = VAlign.CENTRE,
             strict: bool = False,
-            hover_tooltip: Label | None = None
+            hover_tooltip: Element | None = None
         ) -> None:
         super().__init__(renderer=renderer, hover_tooltip=hover_tooltip)
         self.child = child

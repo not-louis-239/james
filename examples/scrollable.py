@@ -111,16 +111,16 @@ def main():
             if event.type == pg.QUIT:
                 running = False
 
-            if event.type == pg.MOUSEWHEEL:
-                if (
-                    elem is not None
-                    and elem.parents is not None
-                    and (
-                        elem is scrollable
-                        or scrollable in elem.parents
-                    )
-                ):
-                    scrollable.handle_scroll(event)
+            if (
+                event.type == pg.MOUSEWHEEL
+                and elem is not None
+                and elem.parents is not None
+                and (
+                    elem is scrollable
+                    or scrollable in elem.parents
+                )
+            ):
+                scrollable.handle_scroll(event)
 
         screen.fill(THEME[ThemeKey.BG])
         gui.update(dt_s)

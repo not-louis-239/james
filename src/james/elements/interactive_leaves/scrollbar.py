@@ -16,16 +16,18 @@
 import pygame as pg
 from pygame import Rect, Surface
 
-from james.elements.static_leaves.label import Label
 from james.elements.containers.scrollable_display import ScrollableDisplay
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import SupportsGetItemColour
+
+# TODO: add click, drag and fling functionality to the scrollbar
+# we can add a horizontal scrollbar when we need to.
 
 
 class Scrollbar[K](Element[K]):
     def __init__(
             self, *, flex: float = 0, shrink: float = 0,
-            interactive: bool = False, hover_tooltip: Label | None = None,
+            interactive: bool = False, hover_tooltip: Element | None = None,
             tied_to: ScrollableDisplay,
             bar_thickness: int, groove_thickness: int,
             k_bar: K,

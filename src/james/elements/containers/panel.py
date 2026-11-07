@@ -16,7 +16,6 @@
 
 import pygame as pg
 
-from james.elements.static_leaves.label import Label
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import DrawFunc, SupportsGetItemColour
 
@@ -32,7 +31,7 @@ class Panel[K](Element[K]):
             border_w: int = 0,
             renderer: DrawFunc | None = None,
             interactive: bool = True,
-            hover_tooltip: Label | None = None,
+            hover_tooltip: Element | None = None,
         ) -> None:
         super().__init__(
             flex=flex, shrink=shrink, interactive=True, hover_tooltip=hover_tooltip,

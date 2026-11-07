@@ -17,7 +17,6 @@ from typing import Literal
 
 import pygame as pg
 
-from james.elements.static_leaves.label import Label
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import SupportsGetItemColour
 
@@ -31,7 +30,7 @@ class Divider[K](Element[K]):
             flex: int = 1,
             orientation: Literal["horiz", "vert"] = "horiz",
             k_fg: K, thickness: int = 2,
-            hover_tooltip: Label | None = None,
+            hover_tooltip: Element | None = None,
         ) -> None:
         super().__init__(flex=flex, hover_tooltip=hover_tooltip, interactive=True)
 

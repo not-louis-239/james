@@ -18,7 +18,6 @@ from pathlib import Path
 import pygame as pg
 
 from james._internals.img_cache import img_cache
-from james.elements.static_leaves.label import Label
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import SupportsGetItemColour
 from james.helpers.utils import get_text_surf, resize_to_fit
@@ -40,7 +39,7 @@ class _Button[K](Element[K]):
             k_border_hovered: K | None = None,
             k_border_pressed: K | None = None,
             border_w: int = 0,
-            hover_tooltip: Label | None = None,
+            hover_tooltip: Element | None = None,
         ) -> None:
         super().__init__(flex=flex, shrink=shrink, hover_tooltip=hover_tooltip, interactive=True)
 
@@ -154,7 +153,7 @@ class CircleButton[K](_Button):
             k_border_hovered: K | None = None,
             k_border_pressed: K | None = None,
             border_w: int = 0,
-            hover_tooltip: Label | None = None
+            hover_tooltip: Element | None = None
         ) -> None:
         super().__init__(
             flex=flex, shrink=shrink, text=text, font=font, inset=inset,

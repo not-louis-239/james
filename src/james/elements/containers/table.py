@@ -23,7 +23,6 @@ from james._internals.constants import (
     HITBOX_W,
 )
 from james.elements.containers.alignment_boxes import HBox
-from james.elements.static_leaves.label import Label
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import DrawFunc, SupportsGetItemColour
 
@@ -35,7 +34,7 @@ class Table[K](Element[K]):
             row_flexes: list[float] | None = None,
             column_flexes: list[float] | None = None,
             cell_renderer: DrawFunc | None = None,
-            hover_tooltip: Label | None = None
+            hover_tooltip: Element | None = None
         ) -> None:
         super().__init__(flex=flex, shrink=shrink, hover_tooltip=hover_tooltip)
 

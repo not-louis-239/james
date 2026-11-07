@@ -22,11 +22,13 @@ from pathlib import Path
 import pygame as pg
 from pygame import Font, Surface
 
-from james.elements.interactive_leaves.button import CircleButton  # importing from James directly causes an ImportError due to circular imports
-from james.elements.static_leaves.label import Label
+from james._internals.constants import DUMMY_CLEAR, DUMMY_SURFACE
+from james.elements.interactive_leaves.button import (
+    CircleButton,  # importing from James directly causes an ImportError due to circular imports
+)
+from james.helpers.base_elem import Element
 from james.helpers.custom_types import SupportsGetItemColour
 from james.helpers.utils import clamp
-from james._internals.constants import DUMMY_SURFACE, DUMMY_CLEAR
 
 
 class PressAndHoldButton[K](CircleButton[K]):
@@ -39,7 +41,7 @@ class PressAndHoldButton[K](CircleButton[K]):
             k_fg_colour: K, k_fg_hovered: K | None = None, k_fg_pressed: K | None = None,
             k_border_colour: K | None = None, k_border_hovered: K | None = None, k_border_pressed: K | None = None,
             k_fg_arc: K,
-            border_w: int = 0, hover_tooltip: Label | None = None,
+            border_w: int = 0, hover_tooltip: Element | None = None,
             hold_duration_secs: float = 2.5
         ) -> None:
 

@@ -16,7 +16,6 @@
 import pygame as pg
 
 from james._internals.constants import DUMMY_SURFACE
-from james.elements.static_leaves.label import Label
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import DrawFunc, SupportsGetItemColour
 from james.helpers.scroll_physics import ScrollPhysics
@@ -33,7 +32,7 @@ class ScrollableDisplay[K](Element[K]):
             k_bg: K | None = None,
             k_border: K | None = None,
             border_w: int = 0,
-            hover_tooltip: Label | None = None,
+            hover_tooltip: Element | None = None,
             min_internal_w: int = 0,
             min_internal_h: int = 0
         ) -> None:

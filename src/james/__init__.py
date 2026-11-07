@@ -28,7 +28,12 @@ from james.elements.containers import (
     scrollable_display,
     table,
 )
-from james.elements.interactive_leaves import button, input_box, scrollbar, press_and_hold_button
+from james.elements.interactive_leaves import (
+    button,
+    input_box,
+    press_and_hold_button,
+    scrollbar,
+)
 from james.elements.static_leaves import divider, label, spacer
 from james.gui import gui_cls
 from james.helpers import base_elem, custom_types, renderer, utils
@@ -36,6 +41,7 @@ from james.helpers import base_elem, custom_types, renderer, utils
 # Renderer / GUI
 set_default_renderer = renderer.set_default_renderer
 GUI = gui_cls.GUI
+NO_TOOLTIP = gui_cls.NO_TOOLTIP
 
 # Utilities
 Element = base_elem.Element

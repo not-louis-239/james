@@ -28,7 +28,7 @@ class Label[K](Element[K]):
             text: str = "", font: pg.font.Font, inset: int = 0,
             k_fg: K, k_bg: K | None = None, k_border: K | None = None,
             border_w: int = 0,
-            hover_tooltip: Label | None = None
+            hover_tooltip: Element | None = None
         ) -> None:
         super().__init__(flex=flex, shrink=shrink, hover_tooltip=hover_tooltip, interactive=True)
 

@@ -20,8 +20,8 @@
 from enum import Enum, auto
 
 import pygame as pg
-from james import GUI, Panel, VBox, HBox, RectButton, Label, Spacer
 
+from james import GUI, HBox, Label, Panel, RectButton, Spacer, VBox
 
 WN_W, WN_H = 800, 600
 PADDING = 30

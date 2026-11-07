@@ -17,7 +17,6 @@ from collections.abc import Iterator
 
 from pygame import Rect, Surface
 
-from james.elements.static_leaves.label import Label
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import SupportsGetItemColour
 
@@ -26,7 +25,7 @@ class Group[K](Element[K]):
     def __init__(
             self, *children: Element,
             flex: float = 1.0,
-            hover_tooltip: Label | None = None,
+            hover_tooltip: Element | None = None,
         ) -> None:
         """Create a group of elements that aren't necessarily connected."""
         super().__init__(flex=flex, hover_tooltip=hover_tooltip)

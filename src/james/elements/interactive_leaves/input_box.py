@@ -18,7 +18,6 @@ from dataclasses import dataclass
 
 import pygame as pg
 
-from james.elements.static_leaves.label import Label
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import SupportsGetItemColour
 from james.helpers.utils import clamp, get_text_surf, wrap_text
@@ -72,7 +71,7 @@ class InputBox[K](Element[K]):
             k_bg_selection: K | None = None,
             k_sentinel: K | None = None,
             text_size_limit: int = 255,
-            hover_tooltip: Label | None = None,
+            hover_tooltip: Element | None = None,
         ) -> None:
         super().__init__(
             flex=flex, shrink=shrink, hover_tooltip=hover_tooltip, interactive=True
@@ -361,6 +360,13 @@ class InputBox[K](Element[K]):
         self.scroll_offset = 0
         self.mouse_selecting = False
 
+    def overwrite_text(self, new_text: str) -> None:
+        """Overwrite all of `self`'s text with `new_text`, drop all undos and redos,
+        reset state and place the cursor at the end of the new text."""
+
+        self.reset()
+        self.insert_text(new_text)
+
     def set_tooltip(self, msg: str | None = None) -> None:
         self.tooltip_msg = msg
 
@@ -529,10 +535,9 @@ class InputBox[K](Element[K]):
                     self.cursor_flash_time = 0
 
                 # Add characters
-                elif event.key not in (pg.K_RETURN, pg.K_ESCAPE, pg.K_TAB):
-                    if text := event.unicode:
-                        # Append character
-                        self.insert_text(text)
+                elif event.key not in (pg.K_RETURN, pg.K_ESCAPE, pg.K_TAB) and (text := event.unicode):
+                    # Append character
+                    self.insert_text(text)
 
         self._ensure_cursor_visible()
         return self.text != old_contents

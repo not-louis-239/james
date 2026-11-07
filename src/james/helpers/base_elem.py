@@ -16,7 +16,6 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
 
 import pygame as pg
 
@@ -24,15 +23,12 @@ from james._internals.constants import HITBOX_COLOUR_0, HITBOX_W
 from james.helpers import renderer as _renderer
 from james.helpers.custom_types import DrawFunc, SupportsGetItemColour
 
-if TYPE_CHECKING:
-    from james.elements.static_leaves.label import Label
-
 
 class Element[K](ABC):
     def __init__(
             self, *, flex: float = 0.0, shrink: float = 0.0,
             interactive: bool = False,
-            hover_tooltip: Label | None = None,
+            hover_tooltip: Element | None = None,
         ) -> None:
         # The ratios of flex or shrink for different UI components
         # determines how the excess or shortage of space is distributed

@@ -20,11 +20,33 @@ from james.helpers import renderer as _renderer
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import DrawFunc, SupportsGetItemColour
 
+# This is an alias for clarity.
+# By default, an element's tooltip is `None`, which shows no tooltip,
+# but if it is nested inside an element that has one, shows that element's tooltip
+# instead.
+# With `NO_TOOLTIP` an element suppresses any tooltips provided by its parents.
+NO_TOOLTIP = False
+
 
 def _propagate_update(elem: Element, dt_s: float) -> None:
     elem.update(dt_s)
     for c in elem.children:
         _propagate_update(c, dt_s)
+
+
+def _get_tooltip(hovered_elem: Element) -> Element | None:
+    current = hovered_elem
+
+    while current is not None:
+        if current.hover_tooltip is NO_TOOLTIP:
+            return None
+
+        if current.hover_tooltip is not None:
+            return current.hover_tooltip
+
+        current = current.parent
+
+    return None
 
 
 class GUI:
@@ -111,26 +133,31 @@ class GUI:
             surface.blit(self.work_surface, (0, 0))
 
         # Draw hover tooltip
-        if self.hovered and self.hovered.hover_tooltip is not None:
-
+        if self.hovered and self.hovered is not None:
             # Calculate label position
             # Prefer bottom-right, but if there isn't enough space,
             # switch between bottom<->top or right<->left.
 
             mx, my = pg.mouse.get_pos()
-            label = self.hovered.hover_tooltip
-            label_w, label_h = label.preferred_size()
-            label_rect = pg.Rect(mx + self.tooltip_margin, my + self.tooltip_margin, label_w, label_h)
+            tooltip = _get_tooltip(self.hovered)
+            if not tooltip:
+                return  # no tooltip to show
 
-            if label_rect.right > surface.get_width():
-                label_rect.left = mx - label_rect.width - self.tooltip_margin
-                label_rect.right = mx - self.tooltip_margin
-            if label_rect.bottom > surface.get_height():
-                label_rect.top = my - label_rect.height - self.tooltip_margin
-                label_rect.bottom = my - self.tooltip_margin
+            tw, th = tooltip.preferred_size()
+            tooltip_rect = pg.Rect(mx + self.tooltip_margin, my + self.tooltip_margin, tw, th)
+
+            if tooltip.layout_dirty:
+                tooltip.layout(tooltip_rect)
+
+            if tooltip_rect.right > surface.get_width():
+                tooltip_rect.left = mx - tooltip_rect.width - self.tooltip_margin
+                tooltip_rect.right = mx - self.tooltip_margin
+            if tooltip_rect.bottom > surface.get_height():
+                tooltip_rect.top = my - tooltip_rect.height - self.tooltip_margin
+                tooltip_rect.bottom = my - self.tooltip_margin
 
             # Draw label
-            label.layout(label_rect)
+            tooltip.layout(tooltip_rect)
             self._prepare_work_surface(surface.size)
-            self.renderer(self.work_surface, label, theme)
+            self.renderer(self.work_surface, tooltip, theme)
             surface.blit(self.work_surface, (0, 0))

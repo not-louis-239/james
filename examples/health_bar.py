@@ -21,7 +21,7 @@
 
 import pygame as pg
 
-from james import GUI, Element, HBox, Label, Panel, RectButton, VBox
+from james import GUI, Element, HBox, Panel, RectButton, VBox
 from james.helpers.custom_types import Colour, SupportsGetItemColour
 from james.helpers.utils import get_text_surf
 
@@ -41,7 +41,7 @@ THEME: dict[str, Colour] = {
 class HealthBar[K](Element[K]):
     def __init__(
             self, *, flex: float = 0, shrink: float = 0,
-            interactive: bool = False, hover_tooltip: Label | None = None,
+            interactive: bool = False, hover_tooltip: Element | None = None,
             current_health: int = 0, max_health: int = 100,
             k_bg: K, k_fg_high: K, k_fg_low: K, k_fg_text: K,
             k_border: K, border_w: int = 2, font: pg.font.Font, inset: int = 0,

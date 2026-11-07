@@ -17,7 +17,6 @@ from typing import Literal
 
 from pygame import Rect, Surface
 
-from james.elements.static_leaves.label import Label
 from james.helpers.base_elem import Element
 from james.helpers.custom_types import SupportsGetItemColour
 
@@ -29,7 +28,7 @@ class Collapsible[K](Element[K]):
             trigger: Element, content: Element,
             gap: int = 0,  # gap between trigger and content when expanded
             expand_direction: Literal["up", "down", "left", "right"] = "down",
-            hover_tooltip: Label | None = None,
+            hover_tooltip: Element | None = None,
         ) -> None:
         super().__init__(flex=flex, shrink=shrink, hover_tooltip=hover_tooltip)
 
