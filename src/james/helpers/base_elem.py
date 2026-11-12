@@ -215,15 +215,14 @@ class Element[K](ABC):
         self.rect = rect
         self.layout_dirty = False
 
-    @abstractmethod
-    def preferred_size(self) -> tuple[int, int]:
-        """How big should this UI element be, given no constraints?"""
-        raise NotImplementedError
-
-    @abstractmethod
     def layout(self, rect: pg.Rect) -> None:
         """Assign the rect to `self` and divide space between
         any potential children of `self`."""
+        self.assign_rect(rect)
+
+    @abstractmethod
+    def preferred_size(self) -> tuple[int, int]:
+        """How big should this UI element be, given no constraints?"""
         raise NotImplementedError
 
     @abstractmethod

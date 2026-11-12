@@ -146,8 +146,8 @@ A custom element only needs to define:
         """How big the UI element should be if there are no constraints."""
 
     def layout(self, rect: pygame.Rect) -> None:
-        """Function to assign the rect to `self` and calculate space
-        and rects for children."""
+        """Assign the rect to `self` and divide space between
+        any potential children of `self`."""
         
         # Call this method to bind the `rect` to `self` and
         # reset `self.layout_dirty` to False.
